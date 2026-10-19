@@ -92,22 +92,62 @@
     "products": "Egg trays · Jar covers"
   },
   "account": {
-    "signedInAs": "Signed in as {{name}}",
-    "roles": "Roles",
+    "loading": "Loading…",
     "signOut": "Sign out",
     "signingOut": "Signing out…",
-    "placeholder": "Temporary page. Real screens are built after their mockups are approved.",
-    "loading": "Loading…",
-    "loadError": "Could not reach the server.",
-    "mustChange": {
-      "title": "You must choose a new password.",
-      "body": "Your administrator set your password. The screen to choose a new one is coming soon; until then you cannot continue. Ask your administrator."
+    "signOutInstead": "Sign out instead",
+    "subtitle": "Your details, language and password.",
+    "details": {
+      "title": "Your details",
+      "roles": "Roles",
+      "note": "To change your name or roles, ask an administrator."
+    },
+    "display": {
+      "title": "Display",
+      "language": "Language",
+      "calendar": "Calendar",
+      "ethiopian": "Ethiopian (default)",
+      "gregorian": "Gregorian",
+      "note": "Saved on this device. Dates are stored exactly either way."
+    },
+    "password": {
+      "title": "Change password",
+      "titleForced": "Choose a new password",
+      "sub": "Choose a password only you know. At least 10 characters.",
+      "subForced": "Your administrator set a temporary password. Choose your own to continue.",
+      "current": "Current password",
+      "new": "New password",
+      "repeat": "Repeat the new password",
+      "show": "Show",
+      "hide": "Hide",
+      "showAll": "Show passwords",
+      "hideAll": "Hide passwords",
+      "rules": "At least 10 characters, and different from your current password.",
+      "submit": "Change password",
+      "submitForced": "Save and continue",
+      "note": "Your other devices are signed out when you change it. This one stays signed in.",
+      "noteForced": "You will go straight to the app after saving.",
+      "errWrong": "The current password is wrong.",
+      "errShort": "Use at least 10 characters.",
+      "errSame": "Choose a password different from the current one.",
+      "errMismatch": "The two passwords do not match.",
+      "okTitle": "Password changed.",
+      "okBody": "Your other devices were signed out.",
+      "offline": {
+        "title": "No connection to the server.",
+        "body": "Check the network, then try again. Nothing you typed is lost."
+      },
+      "other": {
+        "title": "Something went wrong.",
+        "body": "Try again in a moment. If it keeps happening, tell your administrator."
+      }
     }
   },
   "nav": {
     "main": "Main menu",
     "menu": "Menu",
-    "users": "Users"
+    "users": "Users",
+    "account": "Account"
   },
   "users": {
     "summary_one": "{{count}} person · {{active}} active",

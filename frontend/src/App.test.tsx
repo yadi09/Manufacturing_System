@@ -40,17 +40,17 @@ describe("App", () => {
     expect(await screen.findByText("Meron Haile")).toBeInTheDocument();
   });
 
-  it("someone without users.manage never sees the users screen or its menu item", async () => {
+  it("someone without users.manage lands on their account, and never sees the users screen or its menu item", async () => {
     start({ ...ADMIN_ME, permissions: [], roles: [{ key: "cashier", name: "Cashier / sales", name_am: "ገንዘብ ተቀባይ / ሽያጭ" }] }, "/users");
-    expect(await screen.findByText(/Signed in as/)).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Account" })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Users" })).not.toBeInTheDocument();
     expect(screen.queryByText("Meron Haile")).not.toBeInTheDocument();
-    expect(window.location.pathname).toBe("/");
+    expect(window.location.pathname).toBe("/account");
   });
 
-  it("a user who must change the password sees only that notice, not the app", async () => {
+  it("a user who must change the password sees only that form, not the app", async () => {
     start({ ...ADMIN_ME, must_change_password: true }, "/users");
-    expect(await screen.findByText("You must choose a new password.")).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 2, name: "Choose a new password" })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { level: 1, name: "Users" })).not.toBeInTheDocument();
     expect(screen.queryByText("Meron Haile")).not.toBeInTheDocument();
   });

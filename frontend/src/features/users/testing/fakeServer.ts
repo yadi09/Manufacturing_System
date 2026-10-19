@@ -62,6 +62,9 @@ export interface FakeOptions {
 
 export function createFakeServer(options: FakeOptions = {}) {
   const users = (options.users ?? USERS).map((x) => ({ ...x, roles: [...x.roles] }));
+  // The signed-in person, and the password they have now (for the change-password endpoint).
+  let me: User | null = options.me === undefined ? ADMIN_ME : options.me;
+  const currentPassword = "current-password-1";
   const calls: Call[] = [];
   let nextId = 100;
   const adminCount = () => users.filter((x) => x.active && x.roles.includes("admin")).length;
@@ -71,7 +74,17 @@ export function createFakeServer(options: FakeOptions = {}) {
     const failStatus = options.failing?.[`${method} ${path}`];
     if (failStatus) return { status: failStatus, body: { error: failStatus === 0 ? "network" : "internal" } };
 
-    if (method === "GET" && path === "/api/auth/me") return options.me === null ? { status: 401, body: { error: "unauthenticated" } } : { status: 200, body: options.me ?? ADMIN_ME };
+    if (method === "GET" && path === "/api/auth/me") return me === null ? { status: 401, body: { error: "unauthenticated" } } : { status: 200, body: me };
+    if (method === "POST" && path === "/api/auth/password") {
+      if (me === null) return { status: 401, body: { error: "unauthenticated" } };
+      const b = body as { current_password: string; new_password: string };
+      if (b.current_password !== currentPassword) return { status: 403, body: { error: "wrong_password" } };
+      if (b.new_password.length < 10) return { status: 422, body: { error: "weak_password" } };
+      if (b.new_password === b.current_password) return { status: 422, body: { error: "password_unchanged" } };
+      me = { ...me, must_change_password: false };
+      return { status: 204 };
+    }
+    if (me?.must_change_password && path !== "/api/auth/me") return { status: 403, body: { error: "password_change_required" } };
     if (method === "GET" && path === "/api/roles") return { status: 200, body: ROLES };
     if (method === "GET" && path === "/api/users") return { status: 200, body: users };
 
@@ -108,7 +121,7 @@ export function createFakeServer(options: FakeOptions = {}) {
     return { status: 404, body: { error: "not_found" } };
   }
 
-  return { handle, calls, users };
+  return { handle, calls, users, currentPassword };
 }
 
 /** A fetch() that answers from the fake server. */

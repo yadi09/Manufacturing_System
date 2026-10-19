@@ -7,6 +7,7 @@ import { LanguageSwitch } from "../../components/LanguageSwitch";
 import { Notice } from "../../components/Notice";
 import { TextField } from "../../components/TextField";
 import { formatDate } from "../../lib/calendar/format";
+import { useCalendar } from "../../lib/calendar/preference";
 import { loginProblem, type LoginProblem } from "./loginErrors";
 import { useLogin } from "./useSession";
 
@@ -16,6 +17,7 @@ const FILLED_LARGE: Array<[number, number]> = [[2, 1], [5, 2], [8, 1], [3, 4], [
 export function LoginPage() {
   const { t } = useTranslation();
   const login = useLogin();
+  const [calendar] = useCalendar();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -60,7 +62,7 @@ export function LoginPage() {
           <span className="text-base font-semibold md:text-lg" style={{ lineHeight: "26px" }}>
             {t("app.name")}
           </span>
-          <span className="hidden text-sm text-on-brand-muted md:inline lg:hidden">{formatDate(t, new Date())}</span>
+          <span className="hidden text-sm text-on-brand-muted md:inline lg:hidden">{formatDate(t, new Date(), calendar)}</span>
           <span className="hidden items-center gap-3 text-sm text-on-brand-muted lg:flex">
             <span aria-hidden="true" className="h-5 w-px bg-on-brand-muted" />
             {t("login.productLine")}
@@ -78,7 +80,7 @@ export function LoginPage() {
         </div>
 
         <div className="relative hidden items-center justify-between text-sm text-on-brand-muted lg:flex">
-          <span>{formatDate(t, new Date())}</span>
+          <span>{formatDate(t, new Date(), calendar)}</span>
           <span>{t("login.products")}</span>
         </div>
       </aside>
