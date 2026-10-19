@@ -1,7 +1,7 @@
 -include .env
 export
 
-.PHONY: db-up db-down dev test lint migrate
+.PHONY: db-up db-down dev test lint migrate sqlc
 
 db-up:
 	docker compose up -d --wait postgres
@@ -12,13 +12,16 @@ db-down:
 	docker compose down
 
 dev: db-up migrate
-	@echo "Dev targets: backend and frontend are added in the next steps."
+	cd backend && go run ./cmd/api
 
-test:
-	@echo "No tests yet."
+test: db-up
+	cd backend && go test ./...
 
 lint:
-	@echo "No linters yet."
+	cd backend && go vet ./... && test -z "$$(gofmt -l .)"
 
 migrate:
-	@echo "Migrations are added in step 4b."
+	cd backend && go run github.com/pressly/goose/v3/cmd/goose -dir migrations postgres "$(DATABASE_URL)" up
+
+sqlc:
+	cd backend && sqlc generate

@@ -15,7 +15,13 @@ Read these first:
 - Contract: `api/openapi.yaml`; TypeScript API types are generated from it
 - Live updates: Server-Sent Events fed by PostgreSQL LISTEN/NOTIFY
 
-Commands: not set up yet. Add build, test, lint and migration commands here as soon as they exist.
+Commands (run from the repo root; copy `.env.example` to `.env` first; needs Docker for PostgreSQL on port 5433):
+- `make db-up` / `make db-down`: start/stop local PostgreSQL (also creates `crown_test`)
+- `make migrate`: apply goose migrations to the dev database
+- `make sqlc`: regenerate Go query code from `backend/queries` and `backend/migrations`
+- `make dev`: start PostgreSQL, migrate, run the API on `:8080` (`curl localhost:8080/healthz`)
+- `make test`: backend tests, including integration tests against real PostgreSQL (`crown_test`, reset on each run)
+- `make lint`: `go vet` and `gofmt` check for the backend
 
 ## Rules that must hold everywhere
 
