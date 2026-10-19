@@ -85,7 +85,7 @@ func TestUsersAPI_UpdateRolesAndDeactivate(t *testing.T) {
 		t.Fatalf("roles not applied: %s", me.Body)
 	}
 	var oldV, newV string
-	err := e.pool.QueryRow(context.Background(), `SELECT old_value::text, new_value::text FROM audit_log WHERE action = 'update' AND entity = 'users'`).Scan(&oldV, &newV)
+	err := e.pool.QueryRow(context.Background(), `SELECT old_value::text, new_value::text FROM audit_log WHERE action = 'roles_change' AND entity = 'users'`).Scan(&oldV, &newV)
 	if err != nil || !strings.Contains(oldV, "operator") || !strings.Contains(newV, "owner") {
 		t.Fatalf("audit old/new = %s | %s | %v", oldV, newV, err)
 	}
@@ -148,10 +148,12 @@ func TestPasswords_AdminResetEndsSessions(t *testing.T) {
 	if rec := login(e, "w@crown.example", "brand new password"); rec.Code != 200 {
 		t.Fatalf("new password = %d", rec.Code)
 	}
-	var n int
-	e.pool.QueryRow(context.Background(), `SELECT count(*) FROM audit_log WHERE action = 'password_reset' AND new_value IS NULL`).Scan(&n) //nolint:errcheck
-	if n != 1 {
-		t.Fatalf("password_reset audit rows = %d (must exist and carry no secret)", n)
+	var actor, newV string
+	if err := e.pool.QueryRow(context.Background(), `SELECT actor, new_value::text FROM audit_log WHERE action = 'password_reset'`).Scan(&actor, &newV); err != nil {
+		t.Fatalf("password_reset must be audited: %v", err)
+	}
+	if actor != "admin@crown.example" || !strings.Contains(newV, `"must_change_password": true`) || strings.Contains(strings.ToLower(newV), "argon") || strings.Contains(newV, "brand new") {
+		t.Fatalf("audit row = %s %s (must name the actor, the flag, and carry no secret)", actor, newV)
 	}
 }
 

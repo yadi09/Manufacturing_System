@@ -1,9 +1,9 @@
 -- name: CreateUser :one
-INSERT INTO users (email, full_name, password_hash) VALUES ($1, $2, $3)
-RETURNING id, email, full_name, active, created_at;
+INSERT INTO users (email, full_name, password_hash, must_change_password) VALUES ($1, $2, $3, $4)
+RETURNING id, email, full_name, active, must_change_password, created_at;
 
 -- name: GetUserByEmail :one
-SELECT id, email, full_name, password_hash, active FROM users WHERE email = $1;
+SELECT id, email, full_name, password_hash, active, must_change_password FROM users WHERE email = $1;
 
 -- name: AssignRole :exec
 INSERT INTO user_roles (user_id, role_key) VALUES ($1, $2) ON CONFLICT DO NOTHING;
@@ -12,7 +12,7 @@ INSERT INTO user_roles (user_id, role_key) VALUES ($1, $2) ON CONFLICT DO NOTHIN
 INSERT INTO sessions (token_hash, user_id, expires_at) VALUES ($1, $2, $3);
 
 -- name: GetSessionUser :one
-SELECT u.id, u.email, u.full_name, u.active
+SELECT u.id, u.email, u.full_name, u.active, u.must_change_password
 FROM sessions s JOIN users u ON u.id = s.user_id
 WHERE s.token_hash = $1 AND s.expires_at > now();
 
@@ -20,7 +20,7 @@ WHERE s.token_hash = $1 AND s.expires_at > now();
 DELETE FROM sessions WHERE token_hash = $1;
 
 -- name: ListUserRoles :many
-SELECT r.key, r.name FROM user_roles ur JOIN roles r ON r.key = ur.role_key
+SELECT r.key, r.name, r.name_am FROM user_roles ur JOIN roles r ON r.key = ur.role_key
 WHERE ur.user_id = $1 ORDER BY r.key;
 
 -- name: ListUserPermissions :many

@@ -47,8 +47,8 @@ func NewRouter(d Deps) http.Handler {
 		r.Route("/api/auth", func(r chi.Router) {
 			r.Post("/login", h.login)
 			r.Post("/logout", h.logout)
-			r.With(RequireAuth(d.Auth)).Get("/me", h.me)
-			r.With(RequireAuth(d.Auth)).Post("/password", uh.changeOwnPassword)
+			r.With(RequireAuthEvenIfPasswordMustChange(d.Auth)).Get("/me", h.me)
+			r.With(RequireAuthEvenIfPasswordMustChange(d.Auth)).Post("/password", uh.changeOwnPassword)
 		})
 		r.Route("/api", func(r chi.Router) {
 			r.Use(RequireAuth(d.Auth), RequirePermission("users.manage"))

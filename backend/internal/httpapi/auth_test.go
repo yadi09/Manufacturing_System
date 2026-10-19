@@ -57,7 +57,7 @@ func sessionOf(t *testing.T, rec *httptest.ResponseRecorder) *http.Cookie {
 
 func (e env) mustUser(t *testing.T, email string, roles ...string) {
 	t.Helper()
-	if _, err := e.svc.CreateUser(context.Background(), "test", email, "Test User", pw, roles); err != nil {
+	if _, err := e.svc.CreateUser(context.Background(), "test", email, "Test User", pw, roles, false); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -78,7 +78,7 @@ func TestLogin_Me_Logout(t *testing.T) {
 	if !c.HttpOnly || c.SameSite != http.SameSiteLaxMode {
 		t.Fatalf("cookie must be HttpOnly and SameSite=Lax: %+v", c)
 	}
-	if strings.Contains(rec.Body.String(), "password") {
+	if body := rec.Body.String(); strings.Contains(body, "argon2") || strings.Contains(body, `"password"`) || strings.Contains(body, "password_hash") {
 		t.Fatal("response must not include password data")
 	}
 
@@ -231,11 +231,11 @@ func TestCreateUser_Validation(t *testing.T) {
 		{"bad email", "not-an-email", pw, nil, auth.ErrInvalidEmail},
 	}
 	for _, c := range cases {
-		if _, err := e.svc.CreateUser(ctx, "test", c.email, "X", c.password, c.roles); err != c.want {
+		if _, err := e.svc.CreateUser(ctx, "test", c.email, "X", c.password, c.roles, false); err != c.want {
 			t.Errorf("%s: got %v, want %v", c.name, err, c.want)
 		}
 	}
-	if _, err := e.svc.CreateUser(ctx, "test", "c@crown.example", "X", pw, []string{"no_such_role"}); err == nil {
+	if _, err := e.svc.CreateUser(ctx, "test", "c@crown.example", "X", pw, []string{"no_such_role"}, false); err == nil {
 		t.Error("unknown role must be rejected")
 	}
 	var n int

@@ -30,6 +30,9 @@ func run() error {
 	email := flag.String("email", "", "user email (required)")
 	name := flag.String("name", "", "full name (required)")
 	roles := flag.String("roles", "", "comma-separated role keys, e.g. admin or owner,finance")
+	// The developer creating the first administrator chose the password at the terminal, so by
+	// default it need not be changed. Use -must-change when someone else will be told the password.
+	mustChange := flag.Bool("must-change", false, "require the user to change the password at first sign-in")
 	flag.Parse()
 	if *email == "" || *name == "" {
 		return fmt.Errorf("-email and -name are required")
@@ -66,7 +69,7 @@ func run() error {
 			keys = append(keys, k)
 		}
 	}
-	u, err := auth.NewService(pool).CreateUser(ctx, "cli", *email, *name, password, keys)
+	u, err := auth.NewService(pool).CreateUser(ctx, "cli", *email, *name, password, keys, *mustChange)
 	if err != nil {
 		return err
 	}
