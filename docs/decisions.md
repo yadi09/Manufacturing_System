@@ -28,6 +28,7 @@ Handoff for any Claude Code session (desktop app, VS Code extension, terminal). 
 | Hosting | One cloud server. Crown's internet is normal, so offline entry is a safety net for short drops, not the main mode. |
 | Languages | English and Amharic from the first screen; a native Amharic speaker at Crown reviews translations before rollout. |
 | Frontend styling | Tailwind CSS with accessible component primitives. Design system defined and approved first. See "Interface quality" in the plan. |
+| Regrind use | Configurable per BOM instead of fixed: each BOM line says whether regrind is allowed, from which source products and the optional maximum blend. Crown starts with egg tray allowed, jar cover not. Decided 2026-10-19. |
 | Calendar code | Two implementations (Go and TypeScript) tested against one shared `docs/calendar-vectors.json` built from an independent reference. Time zone is a setting, default Africa/Addis_Ababa. Display only; database stays UTC. |
 
 ## Business facts worth remembering (from Crown's weekly report)

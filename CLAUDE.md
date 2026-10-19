@@ -34,7 +34,7 @@ Commands (run from the repo root; copy `.env.example` to `.env` first; needs Doc
 - **Units.** Every quantity carries a unit from the product (egg tray: piece, jar cover: kg). Never mix kg and pieces silently.
 - **Reservation is transactional.** Locking rows so two sales cannot both take the last stock. Allocation re-runs when material or finished goods arrive, first order first.
 - **Deliveries need a reference.** A delivery must point to a receipt, a sample request or a pay-later record. Paid and delivered quantities stay separate on each order line.
-- **Recycling.** Damaged output returns as regrind with no loss. Jar cover regrind goes only into egg tray production. Report gross throughput and net yield separately and label them.
+- **Recycling.** Damaged output returns as regrind with no loss. Each BOM decides whether regrind may be used, from which source products and up to what blend percentage (Crown: egg tray yes, jar cover no); never hard-code it. Report gross throughput and net yield separately and label them.
 - **Idempotent floor entry.** Every floor event has a client-generated key so offline replays are stored once.
 - **Dates.** Store UTC. Display the Ethiopian calendar by default (13 months), Gregorian optional, through one shared tested conversion module. A shift crossing midnight belongs to the day it started.
 - **Languages.** English and Amharic from the first screen. No hard-coded text; all labels live in translation files. Leave room for longer Amharic text and use an Ethiopic font.

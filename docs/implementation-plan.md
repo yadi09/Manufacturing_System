@@ -47,7 +47,7 @@ The database has eight groups of tables. The ones that record what happened are 
 | Group | Core tables | What they hold |
 | --- | --- | --- |
 | Settings and audit | settings, audit_log | Every configurable rule; who changed what, when, and why |
-| Master data | products, product_variants (color), items, units, boms and bom_lines, workspaces, damage_reasons, locations | What Crown makes and with what: unit per product, package size, cycle time, cavities, regrind rules, the five stock locations |
+| Master data | products, product_variants (color), items, units, boms and bom_lines, workspaces, damage_reasons, locations | What Crown makes and with what: unit per product, package size, cycle time, cavities, regrind rules per BOM line (allowed, source products, maximum blend), the five stock locations |
 | Inventory | lots, stock_movements, reservations | Every move of material between locations; reservations tied to an order line or production order with a priority |
 | Purchasing | purchase_orders, purchase_order_lines, goods_receipts | Draft and approved purchase orders, partial arrivals; an editable expected arrival date (ETA) per line, with the order's expected arrival shown on the order and in the purchasing view |
 | Sales | receipts, orders, order_lines, deliveries, sample_requests | Receipt number and quantity only; ordered, paid and delivered per line; sample and pay-later releases |
@@ -82,7 +82,7 @@ The production manager can edit any plan. Each edit creates a new plan version w
 \text{net yield} = \frac{\text{good output (kg)}}{\text{virgin material consumed (kg)}}
 ```
 
-Gross throughput is everything that passed through a machine, regrind included, and is used for productivity. Jar cover regrind goes only into egg tray production.
+Gross throughput is everything that passed through a machine, regrind included, and is used for productivity. Whether a product may use regrind, and how much, is set on its BOM (Crown: egg trays yes, jar covers no).
 
 **4. Paid versus delivered.** Paid and delivered quantities live on each order line and are never merged. A later delivery of a carried-over balance points back to its original receipt. Samples and pay-later releases are their own delivery types, so the finance reconciliation lists them separately instead of as unexplained stock leaving.
 
