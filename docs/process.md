@@ -96,6 +96,7 @@ A short order is reserved in part and produced for the rest; a missing material 
 - The cashier never creates a production order for a customer order by hand. Manual production orders are only for filling the finished goods store.
 - Reservation priority is first order first, and authorized users can reorder it.
 - A stock-level shortage only raises an alert; a shortage caused by an order creates the draft purchase order.
+- Every purchase order line carries an expected arrival date (ETA), which the purchaser can edit. The order's expected arrival is shown on the purchase order and in the purchasing view.
 - After the production manager approves a plan, any change needs a reason and is logged.
 
 ## Daily shift operations
@@ -201,7 +202,7 @@ The owner can open one screen and see what is happening now, what happened so fa
 | Daily, weekly, monthly production | Owner, finance | Output by product, gross and net yield, damage by reason |
 | Reconciliation | Finance | Paid vs. delivered vs. produced, samples, receivables |
 | Performance | Owner, production manager | Per machine, shift and person |
-| Purchasing | Purchaser, owner | Open purchase orders, arrivals, shortages |
+| Purchasing | Purchaser, owner | Open purchase orders with expected arrival dates, arrivals, shortages |
 
 **Offline use.** Data entry screens should save entries when the connection or power drops and sync when it returns, and power cuts are logged as a downtime reason.
 
