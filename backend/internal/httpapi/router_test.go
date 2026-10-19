@@ -16,7 +16,7 @@ import (
 func TestHealthz_DatabaseUp(t *testing.T) {
 	pool := testdb.New(t)
 	rec := httptest.NewRecorder()
-	httpapi.NewRouter(pool).ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/healthz", nil))
+	httpapi.NewRouter(httpapi.Deps{DB: pool}).ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/healthz", nil))
 
 	if rec.Code != http.StatusOK {
 		t.Fatalf("status = %d, want 200", rec.Code)

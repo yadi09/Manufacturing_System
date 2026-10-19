@@ -1,0 +1,207 @@
+// Package auth handles email and password sign-in, sessions and permissions.
+package auth
+
+import (
+	"context"
+	"crypto/rand"
+	"crypto/sha256"
+	"encoding/base64"
+	"errors"
+	"fmt"
+	"net/mail"
+	"strings"
+	"time"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/jackc/pgx/v5/pgxpool"
+
+	"github.com/yadi09/Manufacturing_System/backend/internal/db"
+)
+
+const SessionLifetime = 12 * time.Hour
+
+var (
+	ErrInvalidCredentials = errors.New("auth: invalid email or password")
+	ErrNoSession          = errors.New("auth: no valid session")
+	ErrEmailTaken         = errors.New("auth: email already in use")
+	ErrWeakPassword       = fmt.Errorf("auth: password must be at least %d characters", MinPasswordLength)
+	ErrInvalidEmail       = errors.New("auth: invalid email address")
+)
+
+type Role struct {
+	Key  string `json:"key"`
+	Name string `json:"name"`
+}
+
+// User is the signed-in person with their roles and the permissions those roles grant.
+type User struct {
+	ID          string   `json:"id"`
+	Email       string   `json:"email"`
+	FullName    string   `json:"full_name"`
+	Roles       []Role   `json:"roles"`
+	Permissions []string `json:"permissions"`
+}
+
+func (u User) Can(permission string) bool {
+	for _, p := range u.Permissions {
+		if p == permission {
+			return true
+		}
+	}
+	return false
+}
+
+type Service struct {
+	pool *pgxpool.Pool
+	now  func() time.Time
+	// dummyHash is verified when the email is unknown, so timing does not reveal which emails exist.
+	dummyHash string
+}
+
+func NewService(pool *pgxpool.Pool) *Service {
+	h, _ := HashPassword("dummy-password-for-timing")
+	return &Service{pool: pool, now: time.Now, dummyHash: h}
+}
+
+func normalizeEmail(e string) (string, error) {
+	e = strings.ToLower(strings.TrimSpace(e))
+	if a, err := mail.ParseAddress(e); err != nil || a.Address != e {
+		return "", ErrInvalidEmail
+	}
+	return e, nil
+}
+
+func hashToken(token string) []byte {
+	h := sha256.Sum256([]byte(token))
+	return h[:]
+}
+
+func uuidString(u pgtype.UUID) string {
+	b := u.Bytes
+	return fmt.Sprintf("%x-%x-%x-%x-%x", b[0:4], b[4:6], b[6:8], b[8:10], b[10:16])
+}
+
+// CreateUser adds an active user with the given role keys and audits it.
+func (s *Service) CreateUser(ctx context.Context, actor, email, fullName, password string, roleKeys []string) (User, error) {
+	email, err := normalizeEmail(email)
+	if err != nil {
+		return User{}, err
+	}
+	if len(password) < MinPasswordLength {
+		return User{}, ErrWeakPassword
+	}
+	hash, err := HashPassword(password)
+	if err != nil {
+		return User{}, err
+	}
+	tx, err := s.pool.Begin(ctx)
+	if err != nil {
+		return User{}, err
+	}
+	defer tx.Rollback(ctx) //nolint:errcheck
+	q := db.New(tx)
+
+	row, err := q.CreateUser(ctx, db.CreateUserParams{Email: email, FullName: fullName, PasswordHash: hash})
+	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			return User{}, ErrEmailTaken
+		}
+		return User{}, err
+	}
+	for _, key := range roleKeys {
+		if err := q.AssignRole(ctx, db.AssignRoleParams{UserID: row.ID, RoleKey: key}); err != nil {
+			return User{}, fmt.Errorf("assign role %q: %w", key, err)
+		}
+	}
+	newVal := fmt.Sprintf(`{"email":%q,"roles":%q}`, email, strings.Join(roleKeys, ","))
+	if _, err := q.InsertAudit(ctx, db.InsertAuditParams{
+		Actor: actor, Action: "create", Entity: "users", EntityID: uuidString(row.ID), NewValue: []byte(newVal),
+	}); err != nil {
+		return User{}, err
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return User{}, err
+	}
+	return s.loadUser(ctx, db.New(s.pool), row.ID, email, fullName)
+}
+
+func (s *Service) loadUser(ctx context.Context, q *db.Queries, id pgtype.UUID, email, fullName string) (User, error) {
+	roles, err := q.ListUserRoles(ctx, id)
+	if err != nil {
+		return User{}, err
+	}
+	perms, err := q.ListUserPermissions(ctx, id)
+	if err != nil {
+		return User{}, err
+	}
+	u := User{ID: uuidString(id), Email: email, FullName: fullName, Roles: []Role{}, Permissions: perms}
+	if u.Permissions == nil {
+		u.Permissions = []string{}
+	}
+	for _, r := range roles {
+		u.Roles = append(u.Roles, Role{Key: r.Key, Name: r.Name})
+	}
+	return u, nil
+}
+
+// Login checks the credentials and starts a session. The returned token goes in the cookie;
+// only its hash is stored. Success and failure are both written to the audit log.
+func (s *Service) Login(ctx context.Context, email, password string) (token string, user User, err error) {
+	q := db.New(s.pool)
+	email = strings.ToLower(strings.TrimSpace(email))
+	row, lookupErr := q.GetUserByEmail(ctx, email)
+	hash := s.dummyHash
+	if lookupErr == nil {
+		hash = row.PasswordHash
+	} else if !errors.Is(lookupErr, pgx.ErrNoRows) {
+		return "", User{}, lookupErr
+	}
+	ok := VerifyPassword(password, hash) && lookupErr == nil && row.Active
+	if !ok {
+		s.audit(ctx, q, email, "login_failed", email)
+		return "", User{}, ErrInvalidCredentials
+	}
+
+	raw := make([]byte, 32)
+	if _, err := rand.Read(raw); err != nil {
+		return "", User{}, err
+	}
+	token = base64.RawURLEncoding.EncodeToString(raw)
+	if err := q.CreateSession(ctx, db.CreateSessionParams{
+		TokenHash: hashToken(token), UserID: row.ID,
+		ExpiresAt: pgtype.Timestamptz{Time: s.now().Add(SessionLifetime), Valid: true},
+	}); err != nil {
+		return "", User{}, err
+	}
+	s.audit(ctx, q, email, "login", uuidString(row.ID))
+	user, err = s.loadUser(ctx, q, row.ID, row.Email, row.FullName)
+	return token, user, err
+}
+
+func (s *Service) audit(ctx context.Context, q *db.Queries, actor, action, entityID string) {
+	_, _ = q.InsertAudit(ctx, db.InsertAuditParams{Actor: actor, Action: action, Entity: "auth", EntityID: entityID})
+}
+
+// Authenticate returns the user for a session token, or ErrNoSession.
+func (s *Service) Authenticate(ctx context.Context, token string) (User, error) {
+	if token == "" {
+		return User{}, ErrNoSession
+	}
+	q := db.New(s.pool)
+	row, err := q.GetSessionUser(ctx, hashToken(token))
+	if errors.Is(err, pgx.ErrNoRows) || (err == nil && !row.Active) {
+		return User{}, ErrNoSession
+	}
+	if err != nil {
+		return User{}, err
+	}
+	return s.loadUser(ctx, q, row.ID, row.Email, row.FullName)
+}
+
+// Logout ends the session. Unknown tokens are ignored.
+func (s *Service) Logout(ctx context.Context, token string) error {
+	return db.New(s.pool).DeleteSession(ctx, hashToken(token))
+}

@@ -11,6 +11,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	"github.com/yadi09/Manufacturing_System/backend/internal/auth"
 	"github.com/yadi09/Manufacturing_System/backend/internal/config"
 	"github.com/yadi09/Manufacturing_System/backend/internal/httpapi"
 )
@@ -36,7 +37,7 @@ func run() error {
 	}
 	defer pool.Close()
 
-	srv := &http.Server{Addr: cfg.Addr, Handler: httpapi.NewRouter(pool), ReadHeaderTimeout: 5 * time.Second}
+	srv := &http.Server{Addr: cfg.Addr, Handler: httpapi.NewRouter(httpapi.Deps{DB: pool, Auth: auth.NewService(pool), SecureCookie: cfg.SecureCookie}), ReadHeaderTimeout: 5 * time.Second}
 	go func() {
 		<-ctx.Done()
 		sctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
