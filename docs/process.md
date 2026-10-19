@@ -239,7 +239,7 @@ Adding a product or changing a rule should be a settings change. The system is b
 
 For a new product, an administrator defines the product, unit, package size, BOM (with color variants), workspace, cycle time and QC reasons. Nothing in the flow is specific to egg trays or jar covers.
 
-**Calendar.** Dates show in the Ethiopian calendar by default, including its 13 months, with the Gregorian calendar available as an option. Dates are stored exactly either way, so reports and shift times never depend on the display choice.
+**Calendar.** Dates show in the Ethiopian calendar by default, including its 13 months, with the Gregorian calendar available as an option that each person chooses on their Account page (kept on their device for now). Dates are stored exactly either way, so reports and shift times never depend on the display choice.
 
 **Language.** The interface is available in English and Amharic from the start, and each user can switch at any time. Translations are reviewed by an Amharic speaker at Crown before rollout.
 

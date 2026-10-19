@@ -11,7 +11,7 @@ export function AccountPage({ me }: { me: User }) {
   const logout = useLogout();
   return (
     <AppShell user={me} title={t("nav.account")} subtitle={t("account.subtitle")}>
-      <div className="grid items-start gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 lg:grid-cols-2">
         <div className="flex flex-col gap-6">
           <DetailsCard user={me} />
           <DisplayCard />
