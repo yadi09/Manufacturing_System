@@ -24,6 +24,7 @@ Commands (run from the repo root). First time: `cp .env.example .env` and `cd fr
 - `make test`: backend tests, including integration tests against real PostgreSQL (`crown_test`, reset on each run) and the calendar tests, then frontend unit tests (vitest)
 - `make lint`: `go vet`, `gofmt` check, then TypeScript and ESLint for the frontend
 - `make screenshots`: Playwright captures each page at 360/768/1280 px in English and Amharic into `frontend/screenshots/` (git-ignored). It uses the installed Google Chrome (`channel: "chrome"`), because Playwright's own Chromium does not support Ubuntu 20.04. A CI server needs its own browser setup (install Chrome, or use Playwright's Chromium on a supported OS).
+- `make create-user EMAIL=... NAME="..." ROLES=admin`: create a user (asks for the password, hidden; there is no sign-up page). Role keys are in migration `00003_auth.sql`; run `make migrate` first
 - `make calendar-vectors`: regenerate `docs/calendar-vectors.json` from ICU (Node's Intl). Never generate it from our own calendar code.
 
 Calendar: `backend/internal/calendar` (Go) and `frontend/src/lib/calendar` (TypeScript) must stay in step; both test against `docs/calendar-vectors.json`. Display only; the time zone is a setting, default Africa/Addis_Ababa. Month and weekday names live in the translation files.
