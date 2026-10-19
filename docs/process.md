@@ -19,7 +19,7 @@ This system runs Crown's production chain end to end, from a customer receipt to
 
 **Out of scope for now**
 - Accounting, payroll, prices and invoicing. The system records quantities and receipt numbers only; finance keeps money in its own system.
-- Full HR beyond roles, shifts and attendance for production staff.
+- Full HR beyond roles, shifts and attendance for production staff. Planned later: HR employment management, where every employee has an account and can make requests (for example applying for leave). Until then production staff have no accounts and the shift production manager keeps their records.
 
 **Design principle.** Every rule below is a default that authorized people can override, with a reason where noted and an audit log of who changed what. Business rules are settings, not fixed code, so new products, machines or rule changes need configuration rather than rebuilding.
 
