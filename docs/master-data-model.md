@@ -22,9 +22,17 @@ erDiagram
     WORKSPACE ||--o{ MOULD_SETUP : "runs"
     MOULD ||--o{ MOULD_SETUP : "mounted as"
     MOULD_SETUP }o--o| VARIANT : "cycle time for colour"
-    SHIFT_DEFINITION
-    REASON
-    LOCATION
+    SHIFT_DEFINITION {
+        time start
+        time end
+        date valid_from
+    }
+    REASON {
+        string kind "damage or downtime"
+    }
+    LOCATION {
+        string kind "store or area"
+    }
     PROFESSION ||--o{ EMPLOYEE : "job title"
     EMPLOYEE |o--o| USER_ACCOUNT : "may sign in as"
 ```
