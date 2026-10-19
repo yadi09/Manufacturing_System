@@ -77,6 +77,119 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /api/auth/password:
+    post:
+      operationId: changeOwnPassword
+      summary: Change your own password; your other sessions end
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordRequest"
+      responses:
+        "204":
+          description: Changed
+        "403":
+          description: Current password is wrong (error wrong_password)
+        "422":
+          description: New password too short (error weak_password)
+  /api/roles:
+    get:
+      operationId: listRoles
+      summary: Roles and their permissions (needs users.manage)
+      responses:
+        "200":
+          description: Roles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RoleInfo"
+  /api/users:
+    get:
+      operationId: listUsers
+      summary: All users (needs users.manage)
+      responses:
+        "200":
+          description: Users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserSummary"
+    post:
+      operationId: createUser
+      summary: Create a user (needs users.manage)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "409":
+          description: Email already in use (error email_taken)
+        "422":
+          description: Invalid email, weak password or unknown role
+  /api/users/{id}:
+    patch:
+      operationId: updateUser
+      summary: Change name, active flag and roles; only the fields sent change (needs users.manage)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+      responses:
+        "204":
+          description: Updated; deactivating ends the user's sessions
+        "404":
+          description: Unknown user
+        "409":
+          description: Would leave no active user with users.manage (error last_admin)
+        "422":
+          description: Unknown role
+  /api/users/{id}/password:
+    post:
+      operationId: resetUserPassword
+      summary: Set a new password for a user and end their sessions (needs users.manage)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [password]
+              properties:
+                password:
+                  type: string
+      responses:
+        "204":
+          description: Reset
+        "422":
+          description: Password too short
 components:
   schemas:
     Health:
@@ -130,3 +243,64 @@ components:
         error:
           type: string
           description: Stable code (for example invalid_credentials, unauthenticated, forbidden), translated by the frontend
+    ChangePasswordRequest:
+      type: object
+      required: [current_password, new_password]
+      properties:
+        current_password:
+          type: string
+        new_password:
+          type: string
+    CreateUserRequest:
+      type: object
+      required: [email, full_name, password, roles]
+      properties:
+        email:
+          type: string
+        full_name:
+          type: string
+        password:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+    UpdateUserRequest:
+      type: object
+      properties:
+        full_name:
+          type: string
+        active:
+          type: boolean
+        roles:
+          type: array
+          items:
+            type: string
+    UserSummary:
+      type: object
+      required: [id, email, full_name, active, roles]
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        full_name:
+          type: string
+        active:
+          type: boolean
+        roles:
+          type: array
+          items:
+            type: string
+    RoleInfo:
+      type: object
+      required: [key, name, permissions]
+      properties:
+        key:
+          type: string
+        name:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: string

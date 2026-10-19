@@ -122,6 +122,10 @@ func (s *Service) CreateUser(ctx context.Context, actor, email, fullName, passwo
 	}
 	for _, key := range roleKeys {
 		if err := q.AssignRole(ctx, db.AssignRoleParams{UserID: row.ID, RoleKey: key}); err != nil {
+			var pgErr *pgconn.PgError
+			if errors.As(err, &pgErr) && pgErr.Code == "23503" {
+				return User{}, fmt.Errorf("%w: %q", ErrUnknownRole, key)
+			}
 			return User{}, fmt.Errorf("assign role %q: %w", key, err)
 		}
 	}
