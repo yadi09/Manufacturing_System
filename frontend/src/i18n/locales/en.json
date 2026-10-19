@@ -13,5 +13,49 @@
   "language": {
     "en": "English",
     "am": "አማርኛ"
+  },
+  "calendar": {
+    "ethiopianMonths": {
+      "1": "Meskerem",
+      "2": "Tikimt",
+      "3": "Hidar",
+      "4": "Tahsas",
+      "5": "Tir",
+      "6": "Yekatit",
+      "7": "Megabit",
+      "8": "Miyazya",
+      "9": "Ginbot",
+      "10": "Sene",
+      "11": "Hamle",
+      "12": "Nehase",
+      "13": "Pagume"
+    },
+    "gregorianMonths": {
+      "1": "January",
+      "2": "February",
+      "3": "March",
+      "4": "April",
+      "5": "May",
+      "6": "June",
+      "7": "July",
+      "8": "August",
+      "9": "September",
+      "10": "October",
+      "11": "November",
+      "12": "December"
+    },
+    "weekdays": {
+      "0": "Sunday",
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday"
+    },
+    "format": {
+      "ethiopian": "{{weekday}}, {{month}} {{day}}, {{year}}",
+      "gregorian": "{{weekday}}, {{month}} {{day}}, {{year}}"
+    }
   }
 }
