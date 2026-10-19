@@ -1,0 +1,17 @@
+{
+  "app": {
+    "name": "Crown Manufacturing",
+    "tagline": "Production management"
+  },
+  "foundation": {
+    "title": "Foundation check",
+    "description": "Setup page. Real screens are built after mockups are approved.",
+    "apiStatus": "API status",
+    "language": "Language",
+    "statusOffline": "offline"
+  },
+  "language": {
+    "en": "English",
+    "am": "አማርኛ"
+  }
+}

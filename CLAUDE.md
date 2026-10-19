@@ -17,11 +17,12 @@ Read these first:
 
 Commands (run from the repo root; copy `.env.example` to `.env` first; needs Docker for PostgreSQL on port 5433):
 - `make db-up` / `make db-down`: start/stop local PostgreSQL (also creates `crown_test`)
-- `make migrate`: apply goose migrations to the dev database
+- `make migrate`: apply goose migrations to the dev database (goose runs as a Go tool, nothing to install)
 - `make sqlc`: regenerate Go query code from `backend/queries` and `backend/migrations`
-- `make dev`: start PostgreSQL, migrate, run the API on `:8080` (`curl localhost:8080/healthz`)
-- `make test`: backend tests, including integration tests against real PostgreSQL (`crown_test`, reset on each run)
-- `make lint`: `go vet` and `gofmt` check for the backend
+- `make dev`: start PostgreSQL, migrate, run the API on `:8080` and the web app on `:5173` (Vite proxies `/healthz` to the API)
+- `make test`: backend tests, including integration tests against real PostgreSQL (`crown_test`, reset on each run), then frontend unit tests (vitest)
+- `make lint`: `go vet`, `gofmt` check, then TypeScript and ESLint for the frontend
+- `make screenshots`: Playwright captures each page at 360/768/1280 px in English and Amharic into `frontend/screenshots/` (git-ignored; uses system Google Chrome because Playwright's Chromium does not support Ubuntu 20.04). Run `cd frontend && pnpm install` first
 
 ## Rules that must hold everywhere
 

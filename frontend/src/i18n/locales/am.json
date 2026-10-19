@@ -1,0 +1,17 @@
+{
+  "app": {
+    "name": "ክራውን ማኑፋክቸሪንግ",
+    "tagline": "የምርት አስተዳደር"
+  },
+  "foundation": {
+    "title": "የመሠረት ማረጋገጫ",
+    "description": "የዝግጅት ገጽ ነው። እውነተኛ ገጾች የሚገነቡት ንድፎች ከጸደቁ በኋላ ነው።",
+    "apiStatus": "የኤፒአይ ሁኔታ",
+    "language": "ቋንቋ",
+    "statusOffline": "ግንኙነት የለም"
+  },
+  "language": {
+    "en": "English",
+    "am": "አማርኛ"
+  }
+}
