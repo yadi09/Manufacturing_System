@@ -1,7 +1,7 @@
 -include .env
 export
 
-.PHONY: db-up db-down dev test lint migrate sqlc screenshots
+.PHONY: db-up db-down dev test lint migrate sqlc screenshots calendar-vectors
 
 db-up:
 	docker compose up -d --wait postgres
@@ -24,6 +24,9 @@ lint:
 
 screenshots:
 	cd frontend && pnpm screenshots
+
+calendar-vectors:
+	node scripts/calendar-vectors.mjs > docs/calendar-vectors.json
 
 migrate:
 	cd backend && go tool goose -dir migrations postgres "$(DATABASE_URL)" up

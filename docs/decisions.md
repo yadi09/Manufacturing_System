@@ -45,7 +45,7 @@ The report is saved at `docs/source/Crown_Weekly_Report.xlsx` and is the source 
 ## Status
 
 - Planning documents: done and pushed to `main`.
-- Milestone 1 (Foundation): in progress on `feature/foundation`. Done: repo skeleton, Go API with `settings` and append-only `audit_log`, frontend shell with English/Amharic and PWA, Playwright screenshot script. Next: shared calendar module (use Opus), then login and roles, the design system, and the first approved mockups.
+- Milestone 1 (Foundation): in progress on `feature/foundation`. Done: repo skeleton, Go API with `settings` and append-only `audit_log`, frontend shell with English/Amharic and PWA, Playwright screenshot script, shared calendar module (Go and TypeScript, tested against ICU vectors, with the shift-day rule). Next: login and roles, the design system, and the first approved mockups.
 - Durations for milestones have not been estimated; give them after milestone 1.
 
 ## Still open
@@ -53,4 +53,5 @@ The report is saved at `docs/source/Crown_Weekly_Report.xlsx` and is the source 
 - Day shift report and egg tray report from Crown (not available yet).
 - Maximum regrind percentage, if Crown has one.
 - Real list of colors, machines and shift times, entered as data when known.
-- Amharic translation review by a native speaker before rollout.
+- Amharic translation review by a native speaker before rollout, including the calendar month, weekday and date-format strings.
+- CI: not set up yet. The screenshot script uses the installed Google Chrome; a CI server needs its own browser setup.

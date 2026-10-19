@@ -16,14 +16,17 @@ Read these first:
 - Contract: `api/openapi.yaml`; TypeScript API types are generated from it
 - Live updates: Server-Sent Events fed by PostgreSQL LISTEN/NOTIFY
 
-Commands (run from the repo root; copy `.env.example` to `.env` first; needs Docker for PostgreSQL on port 5433):
+Commands (run from the repo root). First time: `cp .env.example .env` and `cd frontend && pnpm install`. Needs Go, Node with pnpm, and Docker (PostgreSQL 16 on port 5433).
 - `make db-up` / `make db-down`: start/stop local PostgreSQL (also creates `crown_test`)
 - `make migrate`: apply goose migrations to the dev database (goose runs as a Go tool, nothing to install)
-- `make sqlc`: regenerate Go query code from `backend/queries` and `backend/migrations`
-- `make dev`: start PostgreSQL, migrate, run the API on `:8080` and the web app on `:5173` (Vite proxies `/healthz` to the API)
-- `make test`: backend tests, including integration tests against real PostgreSQL (`crown_test`, reset on each run), then frontend unit tests (vitest)
+- `make sqlc`: regenerate Go query code from `backend/queries` and `backend/migrations` (needs `sqlc` on PATH, e.g. `~/go/bin`)
+- `make dev`: start PostgreSQL, migrate, run the API on `:8080` and the web app on `:5173` (Vite proxies `/healthz` to the API); Ctrl+C stops both
+- `make test`: backend tests, including integration tests against real PostgreSQL (`crown_test`, reset on each run) and the calendar tests, then frontend unit tests (vitest)
 - `make lint`: `go vet`, `gofmt` check, then TypeScript and ESLint for the frontend
-- `make screenshots`: Playwright captures each page at 360/768/1280 px in English and Amharic into `frontend/screenshots/` (git-ignored; uses system Google Chrome because Playwright's Chromium does not support Ubuntu 20.04). Run `cd frontend && pnpm install` first
+- `make screenshots`: Playwright captures each page at 360/768/1280 px in English and Amharic into `frontend/screenshots/` (git-ignored). It uses the installed Google Chrome (`channel: "chrome"`), because Playwright's own Chromium does not support Ubuntu 20.04. A CI server needs its own browser setup (install Chrome, or use Playwright's Chromium on a supported OS).
+- `make calendar-vectors`: regenerate `docs/calendar-vectors.json` from ICU (Node's Intl). Never generate it from our own calendar code.
+
+Calendar: `backend/internal/calendar` (Go) and `frontend/src/lib/calendar` (TypeScript) must stay in step; both test against `docs/calendar-vectors.json`. Display only; the time zone is a setting, default Africa/Addis_Ababa. Month and weekday names live in the translation files.
 
 ## Rules that must hold everywhere
 
