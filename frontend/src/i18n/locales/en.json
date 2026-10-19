@@ -1,12 +1,15 @@
 {
   "app": {
     "name": "Crown Manufacturing",
-    "tagline": "Production management"
+    "tagline": "Production management",
+    "nameShort": "Crown Manufacturing"
   },
   "language": {
     "label": "Language",
     "en": "English",
-    "am": "አማርኛ"
+    "am": "አማርኛ",
+    "enShort": "EN",
+    "amShort": "አማ"
   },
   "calendar": {
     "ethiopianMonths": {
@@ -95,6 +98,111 @@
     "signingOut": "Signing out…",
     "placeholder": "Temporary page. Real screens are built after their mockups are approved.",
     "loading": "Loading…",
-    "loadError": "Could not reach the server."
+    "loadError": "Could not reach the server.",
+    "mustChange": {
+      "title": "You must choose a new password.",
+      "body": "Your administrator set your password. The screen to choose a new one is coming soon; until then you cannot continue. Ask your administrator."
+    }
+  },
+  "nav": {
+    "main": "Main menu",
+    "menu": "Menu",
+    "users": "Users"
+  },
+  "users": {
+    "summary_one": "{{count}} person · {{active}} active",
+    "summary_other": "{{count}} people · {{active}} active",
+    "add": "Add user",
+    "search": "Search users",
+    "searchHint": "Name or email",
+    "edit": "Edit",
+    "editFor": "Edit {{name}}",
+    "close": "Close",
+    "cancel": "Cancel",
+    "col": {
+      "name": "Name",
+      "roles": "Roles",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "label": "Status",
+      "active": "Active",
+      "off": "Deactivated",
+      "activeHelp": "This person can sign in.",
+      "offHelp": "This person cannot sign in. Their records stay."
+    },
+    "deactivate": {
+      "button": "Deactivate",
+      "title": "Deactivate {{name}}?",
+      "body": "{{name}} will not be able to sign in, and any open sessions end now. Their records stay. You can turn them back on later.",
+      "confirm": "Deactivate"
+    },
+    "reactivate": "Reactivate",
+    "panel": {
+      "add": "Add user",
+      "edit": "Edit user",
+      "create": "Add user",
+      "save": "Save changes"
+    },
+    "form": {
+      "fullName": "Full name",
+      "email": "Email",
+      "emailLocked": "The email cannot be changed after the user is created.",
+      "password": "Temporary password",
+      "generate": "Generate",
+      "passwordHelp": "At least 10 characters. Tell it to the person in private.",
+      "passwordShort": "Use at least 10 characters.",
+      "nameRequired": "Enter the person's name.",
+      "emailRequired": "Enter an email address.",
+      "roles": "Roles",
+      "rolesHelp": "Pick one or more. Roles decide what the person can see and do."
+    },
+    "reset": {
+      "section": "Password",
+      "sectionBody": "Choose a new password for this person. All their open sessions end.",
+      "button": "Reset password…",
+      "title": "Reset password for {{name}}",
+      "newPassword": "New password",
+      "sessionsTitle": "Open sessions end.",
+      "sessionsBody": "All of {{name}}'s open sessions end when you reset the password. They must choose a new password when they sign in.",
+      "submit": "Reset password"
+    },
+    "result": {
+      "title": {
+        "created": "{{name}} was added",
+        "reset": "Password reset for {{name}}"
+      },
+      "body": "Copy this password now. It is not shown again. Tell {{name}} in private.",
+      "passwordLabel": "Password",
+      "copy": "Copy",
+      "copied": "Copied",
+      "mustChange": "They must choose a new password the first time they sign in.",
+      "done": "Done"
+    },
+    "loading": "Loading users",
+    "noMatch": "No one matches “{{query}}”.",
+    "empty": {
+      "title": "No users yet",
+      "body": "Add the people who will sign in. Each person gets one or more roles that decide what they can see and do."
+    },
+    "loadError": {
+      "title": "Could not load users.",
+      "body": "Check the connection and try again.",
+      "retry": "Try again"
+    },
+    "errors": {
+      "title": "Something went wrong.",
+      "lastAdmin": "You cannot remove the last administrator.",
+      "lastAdminBody": "Make someone else an administrator first, then try again.",
+      "emailTaken": "This email is already in use.",
+      "invalidEmail": "This is not a valid email address.",
+      "weakPassword": "Use at least 10 characters.",
+      "unknownRole": "One of the roles no longer exists. Reload the page.",
+      "notFound": "This user no longer exists. Reload the page.",
+      "passwordChangeRequired": "You must choose a new password first.",
+      "network": "No connection to the server. Check the network and try again.",
+      "other": "Try again in a moment. If it keeps happening, tell your administrator."
+    }
   }
 }
