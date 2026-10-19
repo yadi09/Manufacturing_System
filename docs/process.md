@@ -61,7 +61,7 @@ Each person has one or more roles; roles control what they can see and approve. 
 | Store manager (raw material) | Approves and issues raw material; weighs leftovers at handover |
 | Store manager (finished goods) | Approves staging into stock; releases goods against a receipt, sample or pay-later record |
 | Machine operator | *Not a sign-in role.* Operators have **no account**: they work the machine and are recorded as employees, and the shift production manager enters the logs (material loaded, machine on/off, output, downtime) for them |
-| QC inspector | Has an account. Inspects output and records finished (pieces or kg) and damaged (kg with reasons) themselves, and is personally responsible for the output they inspected: every QC record carries their name |
+| QC inspector | Has an account. Inspects output and records finished (pieces or kg) and damaged (kg with reasons) themselves, and is personally responsible for the output they inspected: every QC record carries their name; a QC result is never entered under anyone else's name |
 | Purchaser | Edits and approves purchase orders; records receiving |
 | Finance (report user) | Reads daily, weekly and monthly production and reconciliation reports |
 | Owner / GM | Reads the live board, dashboards and all reports |
