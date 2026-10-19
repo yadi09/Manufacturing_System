@@ -1,0 +1,25 @@
+# env and secrets
+.env
+.env.*
+!.env.example
+
+# Go
+backend/bin/
+*.test
+*.out
+
+# Node
+node_modules/
+frontend/dist/
+frontend/dev-dist/
+*.tsbuildinfo
+
+# Playwright output
+frontend/screenshots/
+frontend/test-results/
+frontend/playwright-report/
+
+# Editor / OS
+.idea/
+.vscode/
+.DS_Store
