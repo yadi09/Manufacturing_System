@@ -18,6 +18,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/yadi09/Manufacturing_System/backend/internal/db"
+	"github.com/yadi09/Manufacturing_System/backend/internal/settings"
 )
 
 const SessionLifetime = 12 * time.Hour
@@ -25,6 +26,7 @@ const SessionLifetime = 12 * time.Hour
 var (
 	ErrInvalidCredentials = errors.New("auth: invalid email or password")
 	ErrNoSession          = errors.New("auth: no valid session")
+	ErrLockedOut          = errors.New("auth: too many failed attempts")
 	ErrEmailTaken         = errors.New("auth: email already in use")
 	ErrWeakPassword       = fmt.Errorf("auth: password must be at least %d characters", MinPasswordLength)
 	ErrInvalidEmail       = errors.New("auth: invalid email address")
@@ -53,16 +55,23 @@ func (u User) Can(permission string) bool {
 	return false
 }
 
+// LockedError says how long until another attempt is allowed.
+type LockedError struct{ RetryAfter time.Duration }
+
+func (e *LockedError) Error() string   { return ErrLockedOut.Error() }
+func (e *LockedError) Is(t error) bool { return t == ErrLockedOut }
+
 type Service struct {
-	pool *pgxpool.Pool
-	now  func() time.Time
+	pool     *pgxpool.Pool
+	settings *settings.Store
+	now      func() time.Time
 	// dummyHash is verified when the email is unknown, so timing does not reveal which emails exist.
 	dummyHash string
 }
 
 func NewService(pool *pgxpool.Pool) *Service {
 	h, _ := HashPassword("dummy-password-for-timing")
-	return &Service{pool: pool, now: time.Now, dummyHash: h}
+	return &Service{pool: pool, settings: settings.New(pool), now: time.Now, dummyHash: h}
 }
 
 func normalizeEmail(e string) (string, error) {
@@ -152,6 +161,9 @@ func (s *Service) loadUser(ctx context.Context, q *db.Queries, id pgtype.UUID, e
 func (s *Service) Login(ctx context.Context, email, password string) (token string, user User, err error) {
 	q := db.New(s.pool)
 	email = strings.ToLower(strings.TrimSpace(email))
+	if err := s.checkLockout(ctx, q, email); err != nil {
+		return "", User{}, err
+	}
 	row, lookupErr := q.GetUserByEmail(ctx, email)
 	hash := s.dummyHash
 	if lookupErr == nil {
@@ -204,4 +216,32 @@ func (s *Service) Authenticate(ctx context.Context, token string) (User, error) 
 // Logout ends the session. Unknown tokens are ignored.
 func (s *Service) Logout(ctx context.Context, token string) error {
 	return db.New(s.pool).DeleteSession(ctx, hashToken(token))
+}
+
+// checkLockout blocks an email once it has max failed logins inside the window (both are
+// settings). It counts unknown emails the same way, so it reveals nothing about which exist.
+// Attempts made while locked are rejected before the password is checked and are not
+// recorded, so an attacker cannot keep someone locked out for longer than the window.
+func (s *Service) checkLockout(ctx context.Context, q *db.Queries, email string) error {
+	maxAttempts, err := s.settings.Int(ctx, settings.KeyLoginMaxAttempts, 5)
+	if err != nil {
+		return err
+	}
+	mins, err := s.settings.Int(ctx, settings.KeyLoginLockoutMins, 15)
+	if err != nil {
+		return err
+	}
+	window := time.Duration(mins) * time.Minute
+	fails, err := q.RecentFailedLogins(ctx, db.RecentFailedLoginsParams{Email: email, WindowSecs: int32(window.Seconds()), MaxRows: int32(maxAttempts)})
+	if err != nil {
+		return err
+	}
+	if len(fails) < maxAttempts {
+		return nil
+	}
+	retry := fails[len(fails)-1].Time.Add(window).Sub(s.now())
+	if retry < time.Second {
+		retry = time.Second
+	}
+	return &LockedError{RetryAfter: retry}
 }

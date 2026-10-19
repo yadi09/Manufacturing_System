@@ -43,6 +43,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "429":
+          description: Too many failed attempts for this email; see the Retry-After header (seconds). Limits are the settings login_max_attempts and login_lockout_minutes
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /api/auth/logout:
     post:
       operationId: logout

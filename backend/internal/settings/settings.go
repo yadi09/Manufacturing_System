@@ -17,7 +17,11 @@ import (
 	"github.com/yadi09/Manufacturing_System/backend/internal/db"
 )
 
-const KeyDisplayTimeZone = "display_time_zone"
+const (
+	KeyDisplayTimeZone  = "display_time_zone"
+	KeyLoginMaxAttempts = "login_max_attempts"
+	KeyLoginLockoutMins = "login_lockout_minutes"
+)
 
 type Store struct{ pool *pgxpool.Pool }
 
@@ -79,4 +83,20 @@ func (s *Store) SetString(ctx context.Context, actor, key, value, reason string)
 		return err
 	}
 	return tx.Commit(ctx)
+}
+
+// Int returns an integer setting, or def when it is missing or not a positive number.
+func (s *Store) Int(ctx context.Context, key string, def int) (int, error) {
+	row, err := db.New(s.pool).GetSetting(ctx, key)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return def, nil
+	}
+	if err != nil {
+		return 0, err
+	}
+	var v int
+	if err := json.Unmarshal(row.Value, &v); err != nil || v <= 0 {
+		return def, nil
+	}
+	return v, nil
 }
