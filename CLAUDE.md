@@ -41,5 +41,10 @@ Commands: not set up yet. Add build, test, lint and migration commands here as s
 - Write tests with the rules. Use a real PostgreSQL for integration tests. Use Crown's weekly report as fixtures (11 cavities, 14 planned hours, cycle times 30.7 to 31.7 s give targets of 17,489 and 18,059 pieces).
 - No secrets in the repo; use environment variables.
 - Commits and pull requests are authored only by the repo owner. Do not add Claude co-author, session or "generated with" lines.
+- **Model choice.** Use the lightest model that does the job well, to save usage. Default to Sonnet. Switch to Opus only for work where mistakes are costly or reasoning is hard, then switch back. Switch in the session with `/model`; do not stay on Opus out of habit.
+  - Sonnet: routine features, CRUD and API endpoints, UI from an approved mockup, translations, tests for known rules, bug fixes with a clear cause, docs edits, refactors, running commands.
+  - Opus: architecture and data-model decisions, reservation and allocation logic, concurrency and locking, the append-only/derived-number design, Ethiopian calendar edge cases, hard debugging with no clear cause, security review, design direction for the first screens, and a final review before merging risky changes.
+  - If a task on Sonnet goes wrong twice, stop and switch to Opus for that task rather than retrying.
+  - Say which model a task needs when planning it, and say when it is time to switch.
 - Screens are mocked up and approved by the owner before they are built (from milestone 2 on).
 - Floor screens: large touch targets, as few taps as possible, must work offline and sync later.
