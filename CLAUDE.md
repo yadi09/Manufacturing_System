@@ -5,6 +5,7 @@ Production management system for Crown Manufacturing Company (Ethiopia). It cove
 Read these first:
 - `docs/process.md`: how the factory works. Source of truth. Update it in the same commit as any rule change.
 - `docs/implementation-plan.md`: stack, data model, milestones, testing, repo layout.
+- `docs/decisions.md`: how the owner wants to work, later decisions, current status, open items.
 
 ## Stack
 
