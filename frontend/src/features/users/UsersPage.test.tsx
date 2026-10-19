@@ -113,22 +113,22 @@ describe("editing a user", () => {
     expect(within(panel).getByLabelText("Email")).toHaveAttribute("readonly");
     expect(within(panel).getByText("The email cannot be changed after the user is created.")).toBeInTheDocument();
     expect(within(panel).getByRole("checkbox", { name: /Shift supervisor/ })).toBeChecked();
-    expect(within(panel).getByRole("checkbox", { name: /Machine operator/ })).not.toBeChecked();
-    expect(within(panel).getByText("Logs material loaded, machine on and off, output and downtime.")).toBeInTheDocument();
-    expect(within(panel).getAllByRole("checkbox")).toHaveLength(11);
+    expect(within(panel).getByRole("checkbox", { name: /Purchaser/ })).not.toBeChecked();
+    expect(within(panel).getByText("Edits and approves purchase orders and records receiving.")).toBeInTheDocument();
+    expect(within(panel).getAllByRole("checkbox")).toHaveLength(10);
 
     const save = within(panel).getByRole("button", { name: "Save changes" });
     expect(save).toBeDisabled(); // nothing changed yet
-    await user.click(within(panel).getByRole("checkbox", { name: /Machine operator/ }));
+    await user.click(within(panel).getByRole("checkbox", { name: /Purchaser/ }));
     await user.click(within(panel).getByRole("checkbox", { name: /QC inspector/ }));
     expect(save).toBeEnabled();
     await user.click(save);
 
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
     expect(patches(server)).toHaveLength(1);
-    expect(patches(server)[0].body).toEqual({ full_name: "Meron Haile", roles: ["shift_supervisor", "operator"] });
+    expect(patches(server)[0].body).toEqual({ full_name: "Meron Haile", roles: ["shift_supervisor", "purchaser"] });
     // The list refreshes with the new roles.
-    expect(await within(row("Meron Haile")).findByText("Machine operator")).toBeInTheDocument();
+    expect(await within(row("Meron Haile")).findByText("Purchaser")).toBeInTheDocument();
   });
 
   it("deactivating needs a confirmation, then shows the status and a Reactivate button", async () => {

@@ -78,7 +78,7 @@ func TestMustChange_NewUserCanOnlyChangePassword(t *testing.T) {
 func TestMustChange_AdminResetSetsItAgain(t *testing.T) {
 	e := setup(t)
 	admin, _ := signIn(t, e, "admin@crown.example", "admin")
-	_, id := signIn(t, e, "w@crown.example", "operator")
+	_, id := signIn(t, e, "w@crown.example", "purchaser")
 
 	if r := e.do("POST", "/api/users/"+id+"/password", `{"password":"temporary password"}`, admin); r.Code != 204 {
 		t.Fatalf("reset = %d", r.Code)
@@ -114,7 +114,7 @@ func TestMustChange_CLIStyleCreateDoesNotForceIt(t *testing.T) {
 func TestAudit_EachChangeHasItsOwnRowWithOldAndNew(t *testing.T) {
 	e := setup(t)
 	admin, _ := signIn(t, e, "admin@crown.example", "admin")
-	_, id := signIn(t, e, "w@crown.example", "operator")
+	_, id := signIn(t, e, "w@crown.example", "purchaser")
 
 	if r := e.do("PATCH", "/api/users/"+id, `{"roles":["qc_inspector","owner"]}`, admin); r.Code != 204 {
 		t.Fatal(r.Code, r.Body)
@@ -134,7 +134,7 @@ func TestAudit_EachChangeHasItsOwnRowWithOldAndNew(t *testing.T) {
 	rows := auditFor(t, e, id)
 
 	roles := find(rows, "roles_change")
-	if roles == nil || !strings.Contains(roles.oldV, "operator") || strings.Contains(roles.oldV, "owner") || !strings.Contains(roles.newV, "owner") || !strings.Contains(roles.newV, "qc_inspector") || strings.Contains(roles.newV, "operator") {
+	if roles == nil || !strings.Contains(roles.oldV, "purchaser") || strings.Contains(roles.oldV, "owner") || !strings.Contains(roles.newV, "owner") || !strings.Contains(roles.newV, "qc_inspector") || strings.Contains(roles.newV, "purchaser") {
 		t.Fatalf("roles_change = %+v", roles)
 	}
 	off, on := find(rows, "deactivate"), find(rows, "reactivate")
@@ -169,7 +169,7 @@ func TestAudit_EachChangeHasItsOwnRowWithOldAndNew(t *testing.T) {
 func TestReactivate_LetsThePersonSignInAgain(t *testing.T) {
 	e := setup(t)
 	admin, _ := signIn(t, e, "admin@crown.example", "admin")
-	_, id := signIn(t, e, "w@crown.example", "operator")
+	_, id := signIn(t, e, "w@crown.example", "purchaser")
 	e.do("PATCH", "/api/users/"+id, `{"active":false}`, admin)
 	if r := login(e, "w@crown.example", pw); r.Code != 401 {
 		t.Fatalf("deactivated login = %d", r.Code)
@@ -216,8 +216,8 @@ func TestRoles_NamesAndDescriptionsAreDataInBothLanguages(t *testing.T) {
 		t.Fatal(err)
 	}
 	_ = roles
-	if len(raw) != 11 {
-		t.Fatalf("roles = %d, want the 11 from process.md plus administrator", len(raw))
+	if len(raw) != 10 {
+		t.Fatalf("roles = %d, want the sign-in roles: process.md's list minus operators (no accounts), plus administrator", len(raw))
 	}
 	for _, r := range raw {
 		for _, f := range []string{"name", "name_am", "description", "description_am"} {
@@ -225,5 +225,17 @@ func TestRoles_NamesAndDescriptionsAreDataInBothLanguages(t *testing.T) {
 				t.Errorf("role %v has no %s", r["key"], f)
 			}
 		}
+	}
+}
+
+func TestOperatorIsNotASignInRole(t *testing.T) {
+	e := setup(t)
+	admin, _ := signIn(t, e, "admin@crown.example", "admin")
+	rec := e.do("GET", "/api/roles", "", admin)
+	if strings.Contains(rec.Body.String(), `"key":"operator"`) {
+		t.Fatal("operators have no accounts: the operator role must not be assignable")
+	}
+	if r := e.do("POST", "/api/users", `{"email":"x@crown.example","full_name":"X","password":"a long enough one","roles":["operator"]}`, admin); r.Code != 422 || !strings.Contains(r.Body.String(), "unknown_role") {
+		t.Fatalf("creating a user with the operator role = %d %s, want 422 unknown_role", r.Code, r.Body)
 	}
 }

@@ -60,8 +60,8 @@ Each person has one or more roles; roles control what they can see and approve. 
 | Shift production manager / supervisor | Requests daily raw material; updates machine and QC assignments; approves rest rotations; closes the shift report |
 | Store manager (raw material) | Approves and issues raw material; weighs leftovers at handover |
 | Store manager (finished goods) | Approves staging into stock; releases goods against a receipt, sample or pay-later record |
-| Machine operator | Has **no account**. Works the machine and is recorded as an employee; the shift production manager enters the logs (material loaded, machine on/off, output, downtime) for them |
-| QC inspector | Inspects output; records finished (pieces or kg) and damaged (kg with reasons) |
+| Machine operator | *Not a sign-in role.* Operators have **no account**: they work the machine and are recorded as employees, and the shift production manager enters the logs (material loaded, machine on/off, output, downtime) for them |
+| QC inspector | Has an account. Inspects output and records finished (pieces or kg) and damaged (kg with reasons) themselves, and is personally responsible for the output they inspected: every QC record carries their name |
 | Purchaser | Edits and approves purchase orders; records receiving |
 | Finance (report user) | Reads daily, weekly and monthly production and reconciliation reports |
 | Owner / GM | Reads the live board, dashboards and all reports |
@@ -116,7 +116,7 @@ Every shift runs the same cycle, and every floor action is logged as it happens.
 2. **Daily plan.** The system generates a plan per machine from the approved production plan, cycle times, inputs and outputs. The shift production manager can edit it.
 3. **Material request.** The shift production manager requests the day's raw material. The default quantity is daily machine capacity multiplied by the BOM, minus leftovers carried over. The store manager approves and issues it. Material already reserved still needs this approval, so responsibility is traceable.
 4. **Machine run.** The shift production manager (supervisor) logs, in real time and on behalf of the operators, who have no accounts: material loaded (kg, type, lot), machine on, output, downtime with a reason, machine off. Each entry names the operator it is about. Entries come from a tablet, phone or desktop.
-5. **Quality control.** QC inspects every piece. Finished output is counted in pieces (egg trays) or kg (jar covers). Damaged output is recorded in kg with general reasons from a list, not piece by piece.
+5. **Quality control.** QC inspectors, who sign in with their own account, inspect every piece and record the results themselves. Finished output is counted in pieces (egg trays) or kg (jar covers). Damaged output is recorded in kg with general reasons from a list, not piece by piece.
 6. **Staging and stock.** Finished output waits in the staging area until the finished goods store manager approves it into stock. Damaged output goes to the recycling workspace.
 7. **Rest rotation.** After a set time (currently 1 hour), the system prompts that a machine operator should rotate to QC. The operator tells the supervisor, who updates the assignment. Every change is logged with a time.
 8. **Shift closes.** The outgoing shift submits one handover report: raw material remaining (weighed), output, finished goods, damage, and each person's work time by workspace. The night shift's remaining raw material is used in the next day's request.
@@ -176,7 +176,7 @@ Finance's paid quantity and the store's delivered quantity are tracked as separa
 
 The system records who works when and where, so performance can be measured per person, workspace and shift.
 
-- **Employee record:** name, profession, and roles (operator, QC, supervisor and others).
+- **Employee record:** name, profession (operator, QC inspector, supervisor and others), and, for people who sign in, a link to their account. Operators have no account for now.
 - **Shift pattern:** two or three shifts (a setting), each with its own start and end time, with weekly rotation (for example day one week, night the next). Rotation rules are configurable per employee or team.
 - **Weekly roster:** the production manager sets the team for each shift. The system can propose the next week from the rotation rule.
 - **Workspace assignment:** the supervisor records where each person starts and every move afterward (machine 1, machine 2, QC, recycling), each with a time.
