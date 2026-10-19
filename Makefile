@@ -15,7 +15,7 @@ dev: db-up migrate
 	trap 'kill 0' EXIT; (cd backend && go run ./cmd/api) & (cd frontend && pnpm dev --host) & wait
 
 test: db-up
-	cd backend && go test ./...
+	cd backend && go test -p 1 ./...  # one package at a time: they share crown_test
 	cd frontend && pnpm test
 
 lint:
