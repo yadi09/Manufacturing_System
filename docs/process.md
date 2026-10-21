@@ -65,7 +65,7 @@ Each person has one or more roles; roles control what they can see and approve. 
 | Purchaser | Edits and approves purchase orders; records receiving |
 | Finance (report user) | Reads daily, weekly and monthly production and reconciliation reports |
 | Owner / GM | Reads the live board, dashboards and all reports |
-| Administrator | Creates and manages user accounts and roles; later also settings, products, BOMs, shifts and damage reasons |
+| Administrator | Creates and manages user accounts and roles, and defines materials, products, colours and recipes (BOMs); later also settings, shifts and damage reasons |
 
 **Sample approval** is a separate permission. The cashier creates sample requests and the store manager approves them as delivered when releasing the sample. Both are configurable.
 

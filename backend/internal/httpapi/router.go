@@ -10,6 +10,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 
 	"github.com/yadi09/Manufacturing_System/backend/internal/auth"
+	"github.com/yadi09/Manufacturing_System/backend/internal/masterdata"
 )
 
 // Pinger is satisfied by *pgxpool.Pool.
@@ -20,6 +21,8 @@ type Pinger interface {
 type Deps struct {
 	DB   Pinger
 	Auth *auth.Service
+	// Master is the products, materials and recipes service. Optional so older tests can omit it.
+	Master *masterdata.Service
 	// SecureCookie marks the session cookie HTTPS-only. Turn on in production.
 	SecureCookie bool
 }
@@ -62,6 +65,32 @@ func NewRouter(d Deps) http.Handler {
 				r.Post("/{id}/password", uh.resetPassword)
 			})
 		})
+		if d.Master != nil {
+			mh := &masterHandlers{svc: d.Master}
+			read := func(h http.HandlerFunc) http.Handler { return RequirePermission("masterdata.read")(h) }
+			manage := func(h http.HandlerFunc) http.Handler { return RequirePermission("masterdata.manage")(h) }
+			r.Group(func(r chi.Router) {
+				r.Use(RequireAuth(d.Auth))
+				r.Route("/api/materials", func(r chi.Router) {
+					r.Method("GET", "/", read(mh.listMaterials))
+					r.Method("POST", "/", manage(mh.createMaterial))
+					r.Method("PATCH", "/{id}", manage(mh.updateMaterial))
+				})
+				r.Route("/api/products", func(r chi.Router) {
+					r.Method("GET", "/", read(mh.listProducts))
+					r.Method("POST", "/", manage(mh.createProduct))
+					r.Method("PATCH", "/{id}", manage(mh.updateProduct))
+					r.Method("POST", "/{id}/colours", manage(mh.createColour))
+				})
+				r.Route("/api/colours/{id}", func(r chi.Router) {
+					r.Method("PATCH", "/", manage(mh.updateColour))
+					r.Method("GET", "/recipe", read(mh.getRecipe))
+					r.Method("GET", "/recipe/versions", read(mh.listVersions))
+					r.Method("GET", "/recipe/versions/{n}", read(mh.getVersion))
+					r.Method("POST", "/recipe/versions", manage(mh.saveRecipe))
+				})
+			})
+		}
 	}
 	return r
 }

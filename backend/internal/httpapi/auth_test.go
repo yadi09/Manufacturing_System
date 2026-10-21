@@ -13,6 +13,7 @@ import (
 
 	"github.com/yadi09/Manufacturing_System/backend/internal/auth"
 	"github.com/yadi09/Manufacturing_System/backend/internal/httpapi"
+	"github.com/yadi09/Manufacturing_System/backend/internal/masterdata"
 	"github.com/yadi09/Manufacturing_System/backend/internal/testdb"
 )
 
@@ -28,7 +29,7 @@ func setup(t *testing.T) env {
 	t.Helper()
 	pool := testdb.New(t)
 	svc := auth.NewService(pool)
-	return env{pool, svc, httpapi.NewRouter(httpapi.Deps{DB: pool, Auth: svc})}
+	return env{pool, svc, httpapi.NewRouter(httpapi.Deps{DB: pool, Auth: svc, Master: masterdata.New(pool)})}
 }
 
 func (e env) do(method, path, body string, cookie *http.Cookie) *httptest.ResponseRecorder {

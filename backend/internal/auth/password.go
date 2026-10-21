@@ -6,18 +6,32 @@ import (
 	"encoding/base64"
 	"fmt"
 	"strings"
+	"testing"
 
 	"golang.org/x/crypto/argon2"
 )
 
 // Argon2id parameters (OWASP minimum profile: 19 MiB, 2 passes, 1 lane).
-const (
-	argonMemory  = 19 * 1024
-	argonTime    = 2
-	argonThreads = 1
-	argonKeyLen  = 32
-	saltLen      = 16
+var (
+	argonMemory  uint32 = 19 * 1024
+	argonTime    uint32 = 2
+	argonThreads uint8  = 1
 )
+
+const (
+	argonKeyLen = 32
+	saltLen     = 16
+)
+
+// UseCheapHashingInTests makes new password hashes cheap so test suites stay fast. It panics
+// outside a test binary, so it can never weaken the real server. Hashes record their own
+// parameters, so cheap and real hashes both verify.
+func UseCheapHashingInTests() {
+	if !testing.Testing() {
+		panic("auth: UseCheapHashingInTests called outside a test")
+	}
+	argonMemory, argonTime = 8, 1
+}
 
 const MinPasswordLength = 10
 

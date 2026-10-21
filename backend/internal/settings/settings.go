@@ -21,6 +21,8 @@ const (
 	KeyDisplayTimeZone  = "display_time_zone"
 	KeyLoginMaxAttempts = "login_max_attempts"
 	KeyLoginLockoutMins = "login_lockout_minutes"
+	KeyBomWarnPct       = "bom_warn_pct"
+	KeyBomCritPct       = "bom_crit_pct"
 )
 
 type Store struct{ pool *pgxpool.Pool }

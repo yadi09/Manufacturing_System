@@ -205,6 +205,219 @@ paths:
           description: Reset
         "422":
           description: Password too short
+  /api/materials:
+    get:
+      operationId: listMaterials
+      summary: Raw materials and additives, with how many recipes in use contain each (needs masterdata.read)
+      responses:
+        "200":
+          description: Materials
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Material"
+    post:
+      operationId: createMaterial
+      summary: Add a raw material or additive (needs masterdata.manage)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MaterialInput"
+      responses:
+        "201":
+          description: Created
+        "409":
+          description: Name already used (duplicate_name)
+        "422":
+          description: invalid_input, invalid_quantity or unit_not_allowed
+  /api/materials/{id}:
+    patch:
+      operationId: updateMaterial
+      summary: Rename, change bag size, or retire a material (needs masterdata.manage). Kind and unit never change
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MaterialInput"
+      responses:
+        "200":
+          description: Updated
+  /api/products:
+    get:
+      operationId: listProducts
+      summary: Products with their colours and each colour's recipe in use (needs masterdata.read)
+      responses:
+        "200":
+          description: Products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+    post:
+      operationId: createProduct
+      summary: Add a product; its "regrind from this product" item is created automatically (needs masterdata.manage)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductInput"
+      responses:
+        "201":
+          description: Created
+        "409":
+          description: duplicate_name
+        "422":
+          description: invalid_input or invalid_quantity
+  /api/products/{id}:
+    patch:
+      operationId: updateProduct
+      summary: Change a product. The sale unit is locked once any recipe exists (409 unit_locked)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductInput"
+      responses:
+        "200":
+          description: Updated
+        "409":
+          description: duplicate_name or unit_locked
+  /api/products/{id}/colours:
+    post:
+      operationId: createColour
+      summary: Add a colour; its finished-goods item is created automatically (needs masterdata.manage)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ColourInput"
+      responses:
+        "201":
+          description: Created
+  /api/colours/{id}:
+    patch:
+      operationId: updateColour
+      summary: Rename or retire a colour (needs masterdata.manage)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ColourInput"
+      responses:
+        "200":
+          description: Updated
+  /api/colours/{id}/recipe:
+    get:
+      operationId: getRecipe
+      summary: The recipe version in use for a colour (404 no_recipe when there is none)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The recipe
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipe"
+  /api/colours/{id}/recipe/versions:
+    get:
+      operationId: listRecipeVersions
+      summary: Every version, newest first, with who made it and why
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Versions
+    post:
+      operationId: saveRecipe
+      summary: Save the next version and make it the one in use. Earlier versions are kept unchanged
+      description: base_version is the version the editor started from (0 for a first recipe). If someone saved first the answer is 409 version_conflict and nothing changes. Other refusals are 422 with one of reason_required, no_ingredients, duplicate_ingredient, invalid_quantity, unit_not_allowed, unknown_item, invalid_blend, duplicate_regrind_source, unknown_regrind_source, invalid_tolerance.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewRecipe"
+      responses:
+        "201":
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipe"
+        "409":
+          description: version_conflict
+  /api/colours/{id}/recipe/versions/{n}:
+    get:
+      operationId: getRecipeVersion
+      summary: One version, active or replaced
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: n
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: The recipe
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipe"
 components:
   schemas:
     Health:
@@ -348,3 +561,121 @@ components:
           type: string
           nullable: true
           enum: [ethiopian, gregorian]
+    Material:
+      type: object
+      properties:
+        id: { type: string }
+        kind: { type: string, enum: [raw_material, additive] }
+        name: { type: string }
+        name_am: { type: string }
+        unit: { type: string, enum: [kg, g] }
+        bag_qty: { type: string, nullable: true }
+        active: { type: boolean }
+        used_in: { type: integer, description: Recipes in use that contain this material }
+    MaterialInput:
+      type: object
+      properties:
+        kind: { type: string, enum: [raw_material, additive] }
+        name: { type: string }
+        name_am: { type: string }
+        unit: { type: string, enum: [kg, g] }
+        bag_qty: { type: string, nullable: true }
+        active: { type: boolean }
+    Colour:
+      type: object
+      properties:
+        id: { type: string }
+        product_id: { type: string }
+        name: { type: string }
+        name_am: { type: string }
+        active: { type: boolean }
+        active_version: { type: integer, nullable: true, description: null when the colour has no recipe yet }
+    ColourInput:
+      type: object
+      properties:
+        name: { type: string }
+        name_am: { type: string }
+        active: { type: boolean }
+    Product:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        name_am: { type: string }
+        sale_unit: { type: string, enum: [piece, kg] }
+        package_qty: { type: string }
+        weight_per_piece_g: { type: string, nullable: true }
+        active: { type: boolean }
+        colours:
+          type: array
+          items:
+            $ref: "#/components/schemas/Colour"
+    ProductInput:
+      type: object
+      properties:
+        name: { type: string }
+        name_am: { type: string }
+        sale_unit: { type: string, enum: [piece, kg] }
+        package_qty: { type: string }
+        weight_per_piece_g: { type: string, nullable: true }
+        active: { type: boolean }
+    Recipe:
+      type: object
+      description: Quantities are exact decimals as strings, per ONE sale unit of the product
+      properties:
+        colour_id: { type: string }
+        version: { type: integer }
+        status: { type: string, enum: [active, replaced] }
+        reason: { type: string }
+        created_by: { type: string }
+        created_at: { type: string, format: date-time }
+        replaced_at: { type: string, format: date-time, nullable: true }
+        sale_unit: { type: string }
+        lines:
+          type: array
+          items:
+            type: object
+            properties:
+              item_id: { type: string }
+              kind: { type: string }
+              name: { type: string }
+              name_am: { type: string }
+              qty: { type: string }
+              unit: { type: string, enum: [g, kg] }
+        regrind:
+          type: array
+          description: Regrind this recipe may use. A source that is not listed is not allowed.
+          items:
+            type: object
+            properties:
+              source_product_id: { type: string }
+              name: { type: string }
+              name_am: { type: string }
+              max_blend_pct: { type: string, nullable: true, description: null means no maximum }
+        warn_pct: { type: string, nullable: true }
+        crit_pct: { type: string, nullable: true }
+        effective_warn_pct: { type: string }
+        effective_crit_pct: { type: string }
+    NewRecipe:
+      type: object
+      required: [base_version, reason, lines]
+      properties:
+        base_version: { type: integer }
+        reason: { type: string }
+        lines:
+          type: array
+          items:
+            type: object
+            properties:
+              item_id: { type: string }
+              qty: { type: string }
+              unit: { type: string, enum: [g, kg] }
+        regrind:
+          type: array
+          items:
+            type: object
+            properties:
+              source_product_id: { type: string }
+              max_blend_pct: { type: string, nullable: true }
+        warn_pct: { type: string, nullable: true }
+        crit_pct: { type: string, nullable: true }
