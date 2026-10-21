@@ -22,5 +22,5 @@ export default defineConfig({
     }),
   ],
   server: { port: 5173, proxy: { "/healthz": "http://localhost:8080", "/api": "http://localhost:8080" } },
-  test: { include: ["src/**/*.test.{ts,tsx}"], testTimeout: 20_000 }, // the 220-year round trip can stall when the machine is busy
+  test: { include: ["src/**/*.test.{ts,tsx}"], testTimeout: 20_000, setupFiles: ["src/test/setup.ts"] }, // the 220-year round trip can stall when the machine is busy
 });
