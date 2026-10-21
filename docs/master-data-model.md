@@ -1,6 +1,6 @@
 # Master data model (milestone 2): proposal for approval
 
-Status: **proposal, revised 2026-10-21 after the owner's first answers. Waiting for the owner's final approval. No code written.**
+Status: **approved by the owner on 2026-10-21.** Revised the same day after the owner's first answers (cycle time levels, versions only for BOMs, regrind as separate items). No code written yet.
 
 Master data is the set of facts about what Crown makes, with what, on which machines, by whom and when. Later milestones (stock, production, reports) only point at it. This document proposes how to store those facts, in plain language.
 
@@ -84,9 +84,9 @@ Stock movements and floor events (milestones 3 and 4) are append-only too; they 
 | # | Choice | Recommendation | Owner |
 | --- | --- | --- | --- |
 | 1 | A BOM per colour variant, created by copying another colour's BOM | Yes. Colours may need different masterbatch; copying keeps setup quick | Yes |
-| 2 | Cycle time: standard on the mould setup, planned per day by the planner, actual logged | Yes (revised from "versioned by date" after the owner explained that cycle time depends on the machine, the shift, the manager and the planner) | Confirm |
-| 3 | One regrind item per source product ("Regrind from egg tray", "Regrind from jar cover") instead of one regrind item with a tag | Yes: separate stock lines keep counts exact per source and make the BOM rule simple to enforce | Confirm |
-| 4 | Versions only for BOMs; cycle times and shift times are editable and audited | Yes (revised: the owner said a configured recipe is used always, while cycle times change with the person) | Confirm |
+| 2 | Cycle time: standard on the mould setup, planned per day by the planner, actual logged | Yes (revised from "versioned by date" after the owner explained that cycle time depends on the machine, the shift, the manager and the planner) | Yes |
+| 3 | One regrind item per source product ("Regrind from egg tray", "Regrind from jar cover") instead of one regrind item with a tag | Yes: separate stock lines keep counts exact per source and make the BOM rule simple to enforce | Yes |
+| 4 | Versions only for BOMs; cycle times and shift times are editable and audited | Yes (revised: the owner said a configured recipe is used always, while cycle times change with the person) | Yes |
 | 5 | Damage and downtime reasons in one list with a kind tag | Yes | Yes (a tag) |
 | 6 | Professions as a data list, separate from sign-in roles | Yes | Yes |
 | 7 | Weight per piece on the product (for example 8 g) | Yes | Yes |
