@@ -152,7 +152,14 @@
     "account": "Account",
     "products": "Products",
     "materials": "Materials",
-    "masterData": "Master data"
+    "masterData": "Master data",
+    "machines": "Machines",
+    "shifts": "Shifts",
+    "employees": "Employees",
+    "reasons": "Reasons",
+    "stores": "Stores",
+    "settings": "Settings",
+    "administration": "Administration"
   },
   "users": {
     "summary_one": "{{count}} person · {{active}} active",
@@ -462,6 +469,243 @@
         "unknownSource": "This regrind source no longer exists."
       },
       "copiedRecipe": "Copied from another colour. First recipe for this colour"
+    }
+  },
+  "setup": {
+    "active": "Active",
+    "edit": "Edit",
+    "openFor": "Open {{name}}",
+    "renameFor": "Rename {{name}}",
+    "retireTitle": "Retire {{name}}?",
+    "retiredNote": "This is retired. It is hidden from new choices; old records still show it.",
+    "seconds": "s",
+    "errors": {
+      "invalid_cavities": "Enter a whole number from 1 to 1000, or leave empty.",
+      "invalid_cycle_time": "Enter seconds above 0, up to 3600, with at most 2 decimals.",
+      "invalid_time": "Enter a time as HH:MM, for example 18:00.",
+      "invalid_time_zone": "Choose a time zone from the list.",
+      "reason_required": "Say why the times change.",
+      "tolerance_order": "The warning tolerance must be lower than the critical one.",
+      "not_a_machine": "Moulds can only go on a machine.",
+      "unknown_colour": "That colour does not belong to the mould's product.",
+      "unknown_product": "That product no longer exists.",
+      "unknown_profession": "Choose a profession from the list.",
+      "unknown_user": "That account no longer exists.",
+      "account_linked": "This account already belongs to another employee.",
+      "out_of_range": "A value is outside its allowed range.",
+      "unknown_setting": "The server does not know one of these settings."
+    },
+    "machines": {
+      "title": "Machines and areas",
+      "tab": "Machines and areas",
+      "intro": "Where work happens: the machines, the QC area and the recycling workspace. Moulds and their standard cycle times sit on each machine.",
+      "add": "Add machine or area",
+      "emptyTitle": "No machines or areas yet",
+      "emptyBody": "Add Machine 1, Machine 2, the QC area and the recycling workspace.",
+      "kind": "Kind",
+      "kinds": {
+        "machine": "Machine",
+        "qc": "QC area",
+        "recycling": "Recycling"
+      },
+      "about": {
+        "qc": "Output is inspected here; operators rotate here to rest",
+        "recycling": "Damaged output becomes regrind, with no loss"
+      },
+      "runs24h": "Runs 24 hours",
+      "runs24hHelp": "Every shift plans work here.",
+      "noMould": "No mould on this machine yet",
+      "standard": "Standard cycle time {{s}} s",
+      "cycleNotSet": "Cycle time not set yet",
+      "notSetYet": "Not set yet",
+      "retireBody": "It will no longer be offered for new plans. Old records keep it. You can bring it back later.",
+      "mouldsOn": "Moulds on this machine",
+      "mouldsOnHelp": "The standard cycle time starts each day's plan. The planner may change it for a day or shift.",
+      "takeOff": "Take off machine",
+      "standardCycle": "Standard cycle time",
+      "colourCycle": "Cycle time for {{colour}} (optional)",
+      "addColourCycle": "Cycle time for one colour",
+      "removeColourCycle": "Remove the cycle time for {{colour}}",
+      "targetPreview": "At {{s}} s and {{cavities}} cavities, the {{shift}} shift ({{hours}} hours) targets {{pieces}} pieces.",
+      "mount": "Put a mould on this machine",
+      "noMouldsYet": "Add a mould on the Moulds tab first."
+    },
+    "moulds": {
+      "tab": "Moulds",
+      "intro": "Each mould makes one product. Its number of cavities is used for every target.",
+      "add": "Add mould",
+      "edit": "Edit mould",
+      "emptyTitle": "No moulds yet",
+      "emptyBody": "Add each mould with the product it makes and its number of cavities.",
+      "cavities_one": "{{count}} cavity",
+      "cavities_other": "{{count}} cavities",
+      "cavitiesNotSet": "Cavities not set yet",
+      "cavitiesLabel": "Number of cavities",
+      "cavitiesHelp": "Pieces made in one cycle. Leave empty until Crown confirms it.",
+      "product": "Product it makes",
+      "productLocked": "The product a mould makes cannot change.",
+      "notOnMachine": "Not on a machine",
+      "onMachine": "On {{machine}}",
+      "onMachineCycle": "On {{machine}} · standard {{s}} s",
+      "retireBody": "It will no longer be offered for machines or plans. Old records keep it."
+    },
+    "shifts": {
+      "intro": "The shifts the factory runs, in local time. The machines run 24 hours, so the shifts cover the whole day.",
+      "add": "Add shift",
+      "edit": "Edit shift",
+      "editFor": "Edit {{name}}",
+      "changeNote": "A change to a shift's times applies to new plans and records. Records already made keep the shift they were made in.",
+      "emptyTitle": "No shifts yet",
+      "emptyBody": "Add each shift with its start and end time.",
+      "position": "Shift {{n}}",
+      "crossesTitle": "Crosses midnight",
+      "crossesBody": "Work in this shift belongs to the day it started.",
+      "lengthH_one": "{{count}} hour",
+      "lengthH_other": "{{count}} hours",
+      "lengthHm": "{{h}} h {{m}} min",
+      "lengthTitle": "Shift length",
+      "start": "Starts at",
+      "end": "Ends at",
+      "localTime": "Local time, 24-hour clock.",
+      "sameTime": "The end must differ from the start.",
+      "positionLabel": "Order in the day",
+      "positionRange": "Enter a number from 1 to 10.",
+      "reason": "Reason for the new times",
+      "reasonHelp": "Required. Kept in the audit log with the old and new times.",
+      "retireBody": "It will no longer be offered for new plans and rosters. Old records keep it."
+    },
+    "reasons": {
+      "intro": "The lists people choose from when they record damaged output or a machine stop.",
+      "kinds": {
+        "damage": "Damage",
+        "downtime": "Downtime"
+      },
+      "add": {
+        "damage": "Add damage reason",
+        "downtime": "Add downtime reason"
+      },
+      "edit": "Edit reason",
+      "empty": {
+        "damage": "No damage reasons yet",
+        "downtime": "No downtime reasons yet"
+      },
+      "emptyBody": "Crown's weekly report lists raw material spill from the mould, splitting and colour defect for damage, and power off for downtime.",
+      "retireNote": "A reason is retired, never deleted, so old records keep showing it.",
+      "retireBody": "It will no longer be offered when recording. Old records keep it."
+    },
+    "stores": {
+      "intro": "The places stock and output move between. Only the stores hold stock; the QC and staging areas hold output on its way.",
+      "fixed": "These five places follow how stock moves, so they cannot be added or removed for now. You can rename them.",
+      "holdsStock": "Holds stock",
+      "notStock": "Not stock",
+      "rename": "Rename store",
+      "what": {
+        "raw_store": "Virgin material",
+        "regrind_store": "Regrind, one item per source product",
+        "qc_area": "Output waiting for inspection",
+        "staging_area": "Inspected goods waiting for approval",
+        "fg_store": "Approved finished goods"
+      },
+      "rule": {
+        "raw_store": "Issued only after the store manager approves",
+        "regrind_store": "Keeps where the regrind came from",
+        "qc_area": "Split into finished and damaged",
+        "staging_area": "The finished goods store manager approves entry",
+        "fg_store": "Available and reserved shown apart"
+      }
+    },
+    "employees": {
+      "tab": "Employees",
+      "intro": "Everyone who works at Crown. Operators have no sign-in account; the shift supervisor records their work for them.",
+      "add": "Add employee",
+      "edit": "Edit employee",
+      "search": "Search by name or email",
+      "show": "Show",
+      "filter": {
+        "all": "All",
+        "noAccount": "No account",
+        "account": "With account",
+        "retired": "Retired"
+      },
+      "signsIn": "Signs in",
+      "noAccount": "No account",
+      "recordedBy": "Recorded by the shift supervisor",
+      "emptyTitle": "No employees yet",
+      "emptyBody": "Add each person who works at Crown, operators included.",
+      "noMatch": "No one matches",
+      "noMatchBody": "Try another name or show all employees.",
+      "needProfession": "Add a profession on the Professions tab before adding employees.",
+      "fullName": "Full name",
+      "nameAm": "Name in Amharic script (optional)",
+      "nameRequired": "Enter the full name.",
+      "profession": "Profession",
+      "account": "Sign-in account",
+      "accountHelp": "Choose a user only if this person signs in. Operators have no account for now.",
+      "retireBody": "They will no longer be offered for shifts and records. Their history stays."
+    },
+    "professions": {
+      "tab": "Professions",
+      "intro": "Job titles, in both languages. Each employee has one.",
+      "add": "Add profession",
+      "edit": "Edit profession",
+      "count_one": "{{count}} employee",
+      "count_other": "{{count}} employees",
+      "none": "No employees yet",
+      "emptyTitle": "No professions yet",
+      "emptyBody": "Add the job titles first, for example machine operator and QC inspector.",
+      "retireBody": "It will no longer be offered for new employees. Employees who have it keep it."
+    },
+    "settings": {
+      "intro": "Rules the system follows. Settings for stock, sales and the floor appear here as those parts are built.",
+      "save": "Save changes",
+      "saved": "Settings saved.",
+      "audit": "Every change is written to the audit log with who changed it, when, and the old and new value.",
+      "range": "Enter a whole number from {{min}} to {{max}}.",
+      "groups": {
+        "time": {
+          "title": "Time",
+          "sub": "How dates and times are shown. They are always stored exactly."
+        },
+        "signIn": {
+          "title": "Sign-in",
+          "sub": "Protects accounts from guessed passwords."
+        },
+        "production": {
+          "title": "Production",
+          "sub": "Defaults the floor screens and recipes start from."
+        }
+      },
+      "keys": {
+        "display_time_zone": {
+          "label": "Time zone",
+          "help": "Used to show times and to decide which day a shift belongs to."
+        },
+        "login_max_attempts": {
+          "label": "Failed attempts before a pause",
+          "help": "Counted per email address."
+        },
+        "login_lockout_minutes": {
+          "label": "Pause length",
+          "help": "How long sign-in waits after too many failures."
+        },
+        "rest_rotation_minutes": {
+          "label": "Rest rotation interval",
+          "help": "After this long on a machine, the system suggests a move to QC."
+        },
+        "bom_warn_pct": {
+          "label": "Recipe warning tolerance",
+          "help": "Default for recipes without their own value."
+        },
+        "bom_crit_pct": {
+          "label": "Recipe critical tolerance",
+          "help": "Must be higher than the warning tolerance."
+        }
+      },
+      "units": {
+        "attempts": "attempts",
+        "minutes": "minutes",
+        "percent": "%"
+      }
     }
   }
 }

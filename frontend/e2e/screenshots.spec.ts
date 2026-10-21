@@ -288,6 +288,56 @@ const PAGES: Case[] = [
       await p.getByRole("dialog").getByText("LLDPE M500026").waitFor();
     },
   },
+  // Machines, shifts, people, reasons, stores and settings.
+  { name: "machines", path: "/machines", prepare: (p) => signedInAdmin(p), act: (p) => p.getByText(/Clear jar cap mould|የግልጽ ጀሪካን ክዳን ሻጋታ/).first().waitFor() },
+  {
+    name: "machine-panel",
+    path: "/machines",
+    prepare: (p) => signedInAdmin(p),
+    act: async (p) => {
+      await p.getByRole("button", { name: label("Open Machine 2", "ማሽን 2ን ክፈት") }).click();
+      await p.getByRole("dialog").getByText(/17,489/).waitFor();
+    },
+  },
+  { name: "moulds", path: "/machines?tab=moulds", prepare: (p) => signedInAdmin(p), act: (p) => p.getByText(/Egg tray mould|የእንቁላል ትሪ ሻጋታ/).first().waitFor() },
+  { name: "shifts", path: "/shifts", prepare: (p) => signedInAdmin(p), act: (p) => p.getByText("18:00").first().waitFor() },
+  {
+    name: "shift-edit",
+    path: "/shifts",
+    prepare: (p) => signedInAdmin(p),
+    act: async (p) => {
+      await p.getByRole("button", { name: label("Edit Night", "ሌሊትን አርም") }).click();
+      const panel = p.getByRole("dialog");
+      await panel.getByLabel(label("Starts at", "የሚጀምረው")).fill("19:00");
+      await panel.getByRole("button", { name: label("Save changes", "ለውጦችን አስቀምጥ") }).click();
+      await panel.getByText(label("Say why the times change.", "ሰዓቱ ለምን እንደሚቀየር ይግለጹ።")).waitFor();
+    },
+  },
+  { name: "employees", path: "/employees", prepare: (p) => signedInAdmin(p), act: (p) => p.getByText("dawit.alemu@example.com").waitFor() },
+  {
+    name: "employee-add",
+    path: "/employees",
+    prepare: (p) => signedInAdmin(p),
+    act: async (p) => {
+      await p.getByText("dawit.alemu@example.com").waitFor();
+      await p.getByRole("button", { name: label("Add employee", "ሠራተኛ ጨምር") }).first().click();
+      await p.getByRole("dialog").waitFor();
+    },
+  },
+  { name: "professions", path: "/employees?tab=professions", prepare: (p) => signedInAdmin(p), act: (p) => p.getByText(/Machine operator|የማሽን ኦፕሬተር/).first().waitFor() },
+  { name: "reasons", path: "/reasons", prepare: (p) => signedInAdmin(p), act: (p) => p.getByText(/Splitting|መሰንጠቅ/).first().waitFor() },
+  { name: "stores", path: "/stores", prepare: (p) => signedInAdmin(p), act: (p) => p.getByText(/Regrind store|የሚፈጭ መጋዘን/).first().waitFor() },
+  { name: "settings", path: "/settings", prepare: (p) => signedInAdmin(p), act: (p) => p.getByRole("button", { name: label("Save changes", "ለውጦችን አስቀምጥ") }).waitFor() },
+  {
+    name: "settings-error",
+    path: "/settings",
+    prepare: (p) => signedInAdmin(p),
+    act: async (p) => {
+      await p.getByLabel(label("Recipe warning tolerance", "የቅመማ ቅመም ማስጠንቀቂያ መቻቻል")).fill("12");
+      await p.getByRole("button", { name: label("Save changes", "ለውጦችን አስቀምጥ") }).click();
+      await p.getByText(label("The warning tolerance must be lower than the critical one.", "የማስጠንቀቂያ መቻቻል ከአደገኛው ያነሰ መሆን አለበት።")).waitFor();
+    },
+  },
   {
     name: "users-menu",
     path: "/users",
@@ -306,7 +356,7 @@ for (const c of PAGES) {
     for (const width of c.widths ?? WIDTHS) {
       test(`${c.name} ${lang} ${width}px`, async ({ browser }) => {
         // A tall window, so overlays (panels, dialogs) cover the whole page like they do for a person scrolling.
-        const height = /^(users|account|first-sign-in|products|product|colour|materials|recipe)/.test(c.name) ? 1100 : 800;
+        const height = /^(users|account|first-sign-in|products|product|colour|materials|recipe|machine|moulds|shift|employee|professions|reasons|stores|settings)/.test(c.name) ? 1100 : 800;
         const context = await browser.newContext({ viewport: { width, height } });
         await context.addInitScript((l) => localStorage.setItem("lang", l), lang);
         const page = await context.newPage();
