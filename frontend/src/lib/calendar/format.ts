@@ -28,3 +28,13 @@ export function formatDate(t: TFunction, instant: Date, calendar: CalendarKind =
     year: g.year,
   });
 }
+
+/** A date without the weekday, for tables and histories: "Tikimt 2, 2019". */
+export function formatShortDate(t: TFunction, instant: Date, calendar: CalendarKind = "ethiopian", timeZone?: string): string {
+  if (calendar === "ethiopian") {
+    const e = ethiopianAt(instant, timeZone);
+    return t("calendar.format.ethiopianShort", { month: ethiopianMonthName(t, e.month), day: e.day, year: e.year });
+  }
+  const g = localDate(instant, timeZone);
+  return t("calendar.format.gregorianShort", { month: gregorianMonthName(t, g.month), day: g.day, year: g.year });
+}

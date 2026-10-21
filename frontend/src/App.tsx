@@ -8,6 +8,7 @@ import { useMe } from "./features/auth/useSession";
 import { MaterialsPage } from "./features/masterdata/MaterialsPage";
 import { ProductPage } from "./features/masterdata/ProductPage";
 import { ProductsPage } from "./features/masterdata/ProductsPage";
+import { RecipePage } from "./features/masterdata/RecipePage";
 import { UsersPage } from "./features/users/UsersPage";
 
 export default function App() {
@@ -39,6 +40,7 @@ export default function App() {
         <Route path="/users" element={admin ? <UsersPage me={user} /> : <Navigate to="/account" replace />} />
         <Route path="/products" element={reader ? <ProductsPage me={user} /> : <Navigate to="/account" replace />} />
         <Route path="/products/:id" element={reader ? <ProductPage me={user} /> : <Navigate to="/account" replace />} />
+        <Route path="/colours/:id/recipe" element={reader ? <RecipePage me={user} /> : <Navigate to="/account" replace />} />
         <Route path="/materials" element={reader ? <MaterialsPage me={user} /> : <Navigate to="/account" replace />} />
         <Route path="/account" element={<AccountPage me={user} />} />
         <Route path="*" element={<Navigate to={admin ? "/users" : reader ? "/products" : "/account"} replace />} />

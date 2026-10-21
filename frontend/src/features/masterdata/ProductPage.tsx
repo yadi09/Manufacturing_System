@@ -299,13 +299,16 @@ function ColoursList({ product, canManage, onRename }: { product: Product; canMa
               </Chip>
             )}
           </span>
-          {canManage && (
-            <span className="flex gap-2 md:justify-end">
+          <span className="flex gap-2 md:justify-end">
+            {canManage && (
               <Button variant="secondary" className="h-11 px-3.5 text-sm font-medium" onClick={() => onRename(c)} aria-label={t("master.colours.renameFor", { name: localName(c, lang) })}>
                 {t("master.colours.rename")}
               </Button>
-            </span>
-          )}
+            )}
+            <Link to={`/colours/${c.id}/recipe`} aria-label={t("master.colours.openRecipeFor", { name: localName(c, lang) })} className="inline-flex h-11 items-center rounded-md bg-brand-tint px-3.5 text-sm font-semibold text-brand hover:bg-surface-100">
+              {t("master.colours.openRecipe")}
+            </Link>
+          </span>
         </div>
       ))}
     </div>
