@@ -266,6 +266,20 @@ describe("Employees", () => {
     expect(sent(server, "POST", "/api/employees")[0].body).toEqual({ full_name: "Tigist Worku", name_am: "ትዕግሥት ወርቁ", profession_id: "pr1", user_id: null });
   });
 
+  it("with no professions yet, Add employee leads to adding the first profession", async () => {
+    const { server, user } = start("/employees", { setup: { professions: [], employees: [] } });
+    expect(await screen.findByText("Add a profession first")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Add employee" }));
+    const panel = await screen.findByRole("dialog", { name: "Add profession" });
+    await user.type(within(panel).getByLabelText("Name in English"), "Machine operator");
+    await user.type(within(panel).getByLabelText("Name in Amharic"), "የማሽን ኦፕሬተር");
+    await user.click(within(panel).getByRole("button", { name: "Add profession" }));
+    await vi.waitFor(() => expect(sent(server, "POST", "/api/professions")).toHaveLength(1));
+    await user.click(await screen.findByRole("tab", { name: /Employees/ }));
+    await user.click(screen.getByRole("button", { name: "Add employee" }));
+    expect(await screen.findByRole("dialog", { name: "Add employee" })).toBeInTheDocument();
+  });
+
   it("adds a profession on its tab", async () => {
     const { server, user } = start("/employees?tab=professions");
     expect(await screen.findByText("3 employees")).toBeInTheDocument();

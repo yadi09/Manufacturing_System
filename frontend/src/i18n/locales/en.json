@@ -634,7 +634,7 @@
       "emptyBody": "Add each person who works at Crown, operators included.",
       "noMatch": "No one matches",
       "noMatchBody": "Try another name or show all employees.",
-      "needProfession": "Add a profession on the Professions tab before adding employees.",
+      "needProfession": "Add a profession first",
       "fullName": "Full name",
       "nameAm": "Name in Amharic script (optional)",
       "nameRequired": "Enter the full name.",

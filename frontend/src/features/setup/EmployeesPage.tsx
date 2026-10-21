@@ -5,6 +5,7 @@ import { AppShell } from "../../components/AppShell";
 import { Button } from "../../components/Button";
 import { Chip } from "../../components/Chip";
 import { Icon } from "../../components/Icon";
+import { Notice } from "../../components/Notice";
 import { Tabs } from "../../components/Tabs";
 import { TextField } from "../../components/TextField";
 import type { User } from "../auth/api";
@@ -52,10 +53,18 @@ export function EmployeesPage({ me }: { me: User }) {
   });
   const profs = professions.data ?? [];
 
+  // Every employee needs a profession, so with none yet this goes straight to adding the first one.
+  function addEmployee() {
+    if (professions.isSuccess && profs.every((p) => !p.active)) {
+      setParams({ tab: "professions" }, { replace: true });
+      setProfPanel({});
+    } else setEmpPanel({});
+  }
+
   const action =
     canManage &&
     (tab === "employees" ? (
-      <Button onClick={() => setEmpPanel({})} icon={<Icon name="plus" />} disabled={professions.isSuccess && profs.filter((p) => p.active).length === 0}>
+      <Button onClick={addEmployee} icon={<Icon name="plus" />}>
         {t("setup.employees.add")}
       </Button>
     ) : (
@@ -95,7 +104,13 @@ export function EmployeesPage({ me }: { me: User }) {
               ))}
             </div>
           </div>
-          {profs.length === 0 && professions.isSuccess && canManage && <p className="text-sm text-ink-muted">{t("setup.employees.needProfession")}</p>}
+          {profs.every((p) => !p.active) && professions.isSuccess && canManage && (
+            <Notice tone="info" title={t("setup.employees.needProfession")}>
+              <Button variant="secondary" className="mt-2 h-10 px-4 text-sm font-medium" onClick={addEmployee}>
+                {t("setup.professions.add")}
+              </Button>
+            </Notice>
+          )}
           <ListState query={employees} empty={employees.isSuccess && shown.length === 0} emptyTitle={t(all.length ? "setup.employees.noMatch" : "setup.employees.emptyTitle")} emptyBody={t(all.length ? "setup.employees.noMatchBody" : "setup.employees.emptyBody")} />
           {shown.map((e) => {
             const p = profById.get(e.profession_id);
