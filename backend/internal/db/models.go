@@ -46,6 +46,16 @@ type BomRegrindRule struct {
 	MaxBlendPct     pgtype.Numeric `json:"max_blend_pct"`
 }
 
+type Employee struct {
+	ID           pgtype.UUID        `json:"id"`
+	FullName     string             `json:"full_name"`
+	NameAm       pgtype.Text        `json:"name_am"`
+	ProfessionID pgtype.UUID        `json:"profession_id"`
+	UserID       pgtype.UUID        `json:"user_id"`
+	Active       bool               `json:"active"`
+	CreatedAt    pgtype.Timestamptz `json:"created_at"`
+}
+
 type Item struct {
 	ID              pgtype.UUID        `json:"id"`
 	Kind            string             `json:"kind"`
@@ -59,6 +69,38 @@ type Item struct {
 	CreatedAt       pgtype.Timestamptz `json:"created_at"`
 }
 
+type Location struct {
+	Key        string `json:"key"`
+	HoldsStock bool   `json:"holds_stock"`
+	Position   int32  `json:"position"`
+	Name       string `json:"name"`
+	NameAm     string `json:"name_am"`
+}
+
+type Mould struct {
+	ID        pgtype.UUID        `json:"id"`
+	ProductID pgtype.UUID        `json:"product_id"`
+	Name      string             `json:"name"`
+	NameAm    string             `json:"name_am"`
+	Cavities  pgtype.Int4        `json:"cavities"`
+	Active    bool               `json:"active"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type MouldSetup struct {
+	ID             pgtype.UUID    `json:"id"`
+	WorkspaceID    pgtype.UUID    `json:"workspace_id"`
+	MouldID        pgtype.UUID    `json:"mould_id"`
+	StandardCycleS pgtype.Numeric `json:"standard_cycle_s"`
+	Active         bool           `json:"active"`
+}
+
+type MouldSetupColour struct {
+	SetupID   pgtype.UUID    `json:"setup_id"`
+	VariantID pgtype.UUID    `json:"variant_id"`
+	CycleS    pgtype.Numeric `json:"cycle_s"`
+}
+
 type Product struct {
 	ID              pgtype.UUID        `json:"id"`
 	Name            string             `json:"name"`
@@ -68,6 +110,23 @@ type Product struct {
 	WeightPerPieceG pgtype.Numeric     `json:"weight_per_piece_g"`
 	Active          bool               `json:"active"`
 	CreatedAt       pgtype.Timestamptz `json:"created_at"`
+}
+
+type Profession struct {
+	ID        pgtype.UUID        `json:"id"`
+	Name      string             `json:"name"`
+	NameAm    string             `json:"name_am"`
+	Active    bool               `json:"active"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Reason struct {
+	ID        pgtype.UUID        `json:"id"`
+	Kind      string             `json:"kind"`
+	Name      string             `json:"name"`
+	NameAm    string             `json:"name_am"`
+	Active    bool               `json:"active"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
 type Role struct {
@@ -94,6 +153,17 @@ type Setting struct {
 	Key       string             `json:"key"`
 	Value     []byte             `json:"value"`
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+type Shift struct {
+	ID        pgtype.UUID        `json:"id"`
+	Name      string             `json:"name"`
+	NameAm    string             `json:"name_am"`
+	StartTime pgtype.Time        `json:"start_time"`
+	EndTime   pgtype.Time        `json:"end_time"`
+	Position  int32              `json:"position"`
+	Active    bool               `json:"active"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
 
 type Unit struct {
@@ -125,6 +195,16 @@ type Variant struct {
 	ProductID pgtype.UUID        `json:"product_id"`
 	Name      string             `json:"name"`
 	NameAm    string             `json:"name_am"`
+	Active    bool               `json:"active"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+}
+
+type Workspace struct {
+	ID        pgtype.UUID        `json:"id"`
+	Kind      string             `json:"kind"`
+	Name      string             `json:"name"`
+	NameAm    string             `json:"name_am"`
+	Runs24h   bool               `json:"runs_24h"`
 	Active    bool               `json:"active"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }
