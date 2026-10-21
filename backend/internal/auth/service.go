@@ -48,6 +48,14 @@ type User struct {
 	MustChangePassword bool     `json:"must_change_password"`
 	Roles              []Role   `json:"roles"`
 	Permissions        []string `json:"permissions"`
+	// Preferences are the person's saved display choices; a nil field means not chosen yet.
+	Preferences Preferences `json:"preferences"`
+}
+
+// Preferences are per person and saved on the server. Display only.
+type Preferences struct {
+	Language *string `json:"language"` // "en" or "am"
+	Calendar *string `json:"calendar"` // "ethiopian" or "gregorian"
 }
 
 func (u User) Can(permission string) bool {
@@ -84,6 +92,13 @@ func normalizeEmail(e string) (string, error) {
 		return "", ErrInvalidEmail
 	}
 	return e, nil
+}
+
+func textPtr(t pgtype.Text) *string {
+	if !t.Valid {
+		return nil
+	}
+	return &t.String
 }
 
 func hashToken(token string) []byte {
@@ -156,7 +171,12 @@ func (s *Service) loadUser(ctx context.Context, q *db.Queries, id pgtype.UUID, e
 	if err != nil {
 		return User{}, err
 	}
-	u := User{ID: uuidString(id), Email: email, FullName: fullName, MustChangePassword: mustChange, Roles: []Role{}, Permissions: perms}
+	prefs, err := q.GetUserPreferences(ctx, id)
+	if err != nil {
+		return User{}, err
+	}
+	u := User{ID: uuidString(id), Email: email, FullName: fullName, MustChangePassword: mustChange, Roles: []Role{}, Permissions: perms,
+		Preferences: Preferences{Language: textPtr(prefs.Language), Calendar: textPtr(prefs.Calendar)}}
 	if u.Permissions == nil {
 		u.Permissions = []string{}
 	}

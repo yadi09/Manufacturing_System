@@ -108,7 +108,7 @@
       "calendar": "Calendar",
       "ethiopian": "Ethiopian (default)",
       "gregorian": "Gregorian",
-      "note": "Saved on this device. Dates are stored exactly either way."
+      "note": "Saved to your account, so it follows you to any device. Dates are stored exactly either way."
     },
     "password": {
       "title": "Change password",

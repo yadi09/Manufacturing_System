@@ -32,3 +32,9 @@ WHERE u.active AND rp.permission = 'users.manage';
 SELECT r.key, r.name, r.name_am, r.description, r.description_am, COALESCE(array_agg(rp.permission ORDER BY rp.permission) FILTER (WHERE rp.permission IS NOT NULL), '{}')::text[] AS permissions
 FROM roles r LEFT JOIN role_permissions rp ON rp.role_key = r.key
 GROUP BY r.key ORDER BY r.key;
+
+-- name: GetUserPreferences :one
+SELECT language, calendar FROM users WHERE id = $1;
+
+-- name: UpdateUserPreferences :exec
+UPDATE users SET language = COALESCE(sqlc.narg('language'), language), calendar = COALESCE(sqlc.narg('calendar'), calendar) WHERE id = @id;

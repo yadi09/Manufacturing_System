@@ -38,6 +38,7 @@ export const ADMIN_ME: User = {
   full_name: "Abebe Kebede",
   must_change_password: false,
   permissions: ["audit.read", "settings.manage", "users.manage"],
+  preferences: { language: null, calendar: null },
   roles: [{ key: "admin", name: "Administrator", name_am: "አስተዳዳሪ" }],
 };
 
@@ -82,6 +83,12 @@ export function createFakeServer(options: FakeOptions = {}) {
       if (b.new_password.length < 10) return { status: 422, body: { error: "weak_password" } };
       if (b.new_password === b.current_password) return { status: 422, body: { error: "password_unchanged" } };
       me = { ...me, must_change_password: false };
+      return { status: 204 };
+    }
+    if (method === "PATCH" && path === "/api/auth/preferences") {
+      if (me === null) return { status: 401, body: { error: "unauthenticated" } };
+      const b = body as { language?: "en" | "am"; calendar?: "ethiopian" | "gregorian" };
+      me = { ...me, preferences: { language: b.language ?? me.preferences.language, calendar: b.calendar ?? me.preferences.calendar } };
       return { status: 204 };
     }
     if (me?.must_change_password && path !== "/api/auth/me") return { status: 403, body: { error: "password_change_required" } };
