@@ -195,6 +195,63 @@ const PAGES: Case[] = [
       await p.locator("[aria-invalid=true]").first().waitFor();
     },
   },
+  // Master data: products, colours and materials.
+  { name: "products", path: "/products", prepare: (p) => signedInAdmin(p), act: (p) => p.getByRole("button", { name: /Egg tray|የእንቁላል ትሪ/ }).waitFor() },
+  {
+    name: "products-add",
+    path: "/products",
+    prepare: (p) => signedInAdmin(p),
+    act: async (p) => {
+      await p.getByRole("button", { name: /Egg tray|የእንቁላል ትሪ/ }).waitFor();
+      await p.getByRole("button", { name: label("Add product", "ምርት ጨምር") }).first().click();
+      await p.getByRole("dialog").waitFor();
+      await p.getByRole("button", { name: label("Add product", "ምርት ጨምር") }).last().click(); // shows the required-field messages
+    },
+  },
+  { name: "product-details", path: "/products/p1", prepare: (p) => signedInAdmin(p), act: (p) => p.getByRole("tabpanel").waitFor() },
+  { name: "product-colours", path: "/products/p2?tab=colours", prepare: (p) => signedInAdmin(p), act: (p) => p.getByRole("tabpanel").getByText(/Version 2|ስሪት 2/).waitFor() },
+  {
+    name: "colour-add",
+    path: "/products/p2?tab=colours",
+    prepare: (p) => signedInAdmin(p),
+    act: async (p) => {
+      await p.getByRole("tabpanel").getByText(/Version 2|ስሪት 2/).waitFor();
+      await p.getByRole("button", { name: label("Add colour", "ቀለም ጨምር") }).first().click();
+      await p.getByRole("dialog").waitFor();
+    },
+  },
+  {
+    name: "product-retire",
+    path: "/products/p1",
+    prepare: (p) => signedInAdmin(p),
+    act: async (p) => {
+      await p.getByRole("tabpanel").waitFor();
+      await p.getByRole("button", { name: label("Retire product", "ምርቱን አቋርጥ") }).click();
+      await p.getByRole("alertdialog").waitFor();
+    },
+  },
+  { name: "products-empty", path: "/products", prepare: (p) => signedInAdmin(p, { products: [] }), act: (p) => p.getByRole("heading", { level: 2 }).waitFor() },
+  { name: "materials", path: "/materials", prepare: (p) => signedInAdmin(p), act: (p) => p.getByRole("button", { name: /LLDPE M500026/ }).waitFor() },
+  {
+    name: "materials-add",
+    path: "/materials",
+    prepare: (p) => signedInAdmin(p),
+    act: async (p) => {
+      await p.getByRole("button", { name: /LLDPE M500026/ }).waitFor();
+      await p.getByRole("button", { name: label("Add material", "ቁሳቁስ ጨምር") }).first().click();
+      await p.getByRole("dialog").waitFor();
+    },
+  },
+  {
+    name: "materials-edit",
+    path: "/materials",
+    prepare: (p) => signedInAdmin(p),
+    act: async (p) => {
+      await p.getByRole("button", { name: /Blue masterbatch|ሰማያዊ ማስተርባች/ }).click();
+      await p.getByRole("dialog").waitFor();
+    },
+  },
+  { name: "materials-error", path: "/materials", prepare: (p) => signedInAdmin(p, { failing: { "GET /api/materials": 500 } }), act: (p) => p.getByRole("alert").waitFor() },
   {
     name: "users-menu",
     path: "/users",
@@ -213,7 +270,7 @@ for (const c of PAGES) {
     for (const width of c.widths ?? WIDTHS) {
       test(`${c.name} ${lang} ${width}px`, async ({ browser }) => {
         // A tall window, so overlays (panels, dialogs) cover the whole page like they do for a person scrolling.
-        const height = /^(users|account|first-sign-in)/.test(c.name) ? 1100 : 800;
+        const height = /^(users|account|first-sign-in|products|product|colour|materials)/.test(c.name) ? 1100 : 800;
         const context = await browser.newContext({ viewport: { width, height } });
         await context.addInitScript((l) => localStorage.setItem("lang", l), lang);
         const page = await context.newPage();

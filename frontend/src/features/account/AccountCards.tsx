@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Avatar } from "../../components/Avatar";
 import { Chip } from "../../components/Chip";
+import { Choice } from "../../components/Choice";
 import { LANGUAGES } from "../../i18n";
 import { formatDate, type CalendarKind } from "../../lib/calendar/format";
 import { useCalendar } from "../../lib/calendar/preference";
@@ -35,15 +36,6 @@ export function DetailsCard({ user }: { user: User }) {
         {t("account.details.note")}
       </p>
     </section>
-  );
-}
-
-function Choice({ name, checked, onChange, children }: { name: string; checked: boolean; onChange: () => void; children: React.ReactNode }) {
-  return (
-    <label className={`flex min-h-12 cursor-pointer items-start gap-2.5 rounded-md border px-3.5 py-2.5 ${checked ? "border-brand bg-brand-tint" : "border-line bg-surface-0"}`}>
-      <input type="radio" name={name} checked={checked} onChange={onChange} className="mt-1 size-5 shrink-0 accent-brand" />
-      <span className="flex flex-col">{children}</span>
-    </label>
   );
 }
 

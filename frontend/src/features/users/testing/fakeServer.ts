@@ -2,6 +2,8 @@
 // The real rules are tested against PostgreSQL in the backend; this only has to answer like the server does.
 import type { RoleInfo, UserSummary } from "../api";
 import type { User } from "../../auth/api";
+import type { Colour, Material, MaterialInput, Product, ProductInput } from "../../masterdata/api";
+import { MATERIALS, PRODUCTS } from "../../masterdata/testing/masterFixtures";
 
 export const ROLES: RoleInfo[] = [
   ["admin", "Administrator", "አስተዳዳሪ", "Manages users, settings and master data.", "ተጠቃሚዎችን፣ ቅንብሮችን እና መሠረታዊ መረጃን ያስተዳድራል።", ["audit.read", "settings.manage", "users.manage"]],
@@ -37,7 +39,7 @@ export const ADMIN_ME: User = {
   email: "abebe.kebede@example.com",
   full_name: "Abebe Kebede",
   must_change_password: false,
-  permissions: ["audit.read", "settings.manage", "users.manage"],
+  permissions: ["audit.read", "settings.manage", "users.manage", "masterdata.read", "masterdata.manage"],
   preferences: { language: null, calendar: null },
   roles: [{ key: "admin", name: "Administrator", name_am: "አስተዳዳሪ" }],
 };
@@ -56,6 +58,8 @@ export interface Call {
 
 export interface FakeOptions {
   users?: UserSummary[];
+  materials?: Material[];
+  products?: Product[];
   me?: User | null;
   /** Make a request type fail, for example { "GET /api/users": 500 }. */
   failing?: Record<string, number>;
@@ -67,8 +71,84 @@ export function createFakeServer(options: FakeOptions = {}) {
   let me: User | null = options.me === undefined ? ADMIN_ME : options.me;
   const currentPassword = "current-password-1";
   const calls: Call[] = [];
+  const materials = (options.materials ?? MATERIALS).map((m) => ({ ...m }));
+  const products = (options.products ?? PRODUCTS).map((p) => ({ ...p, colours: p.colours.map((c) => ({ ...c })) }));
   let nextId = 100;
   const adminCount = () => users.filter((x) => x.active && x.roles.includes("admin")).length;
+
+  const sameName = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
+
+  /** Materials, products and colours. Answers like the real server, including its refusals. */
+  function masterHandle(method: string, path: string, body?: unknown): Reply | null {
+    if (!path.startsWith("/api/materials") && !path.startsWith("/api/products") && !path.startsWith("/api/colours")) return null;
+    const can = me?.permissions ?? [];
+    const write = method !== "GET";
+    if (!can.includes(write ? "masterdata.manage" : "masterdata.read")) return { status: 403, body: { error: "forbidden" } };
+    const positive = (v: string) => /^\d{1,9}(\.\d{1,3})?$/.test(v.trim()) && Number(v) > 0;
+
+    if (method === "GET" && path === "/api/materials") return { status: 200, body: materials };
+    if (method === "POST" && path === "/api/materials") {
+      const b = body as MaterialInput;
+      if (materials.some((m) => sameName(m.name, b.name))) return { status: 409, body: { error: "duplicate_name" } };
+      if (b.bag_qty && !positive(b.bag_qty)) return { status: 422, body: { error: "invalid_quantity" } };
+      const m: Material = { id: `m${nextId++}`, kind: b.kind ?? "raw_material", name: b.name, name_am: b.name_am, unit: b.unit ?? "kg", bag_qty: b.bag_qty, active: true, used_in: 0 };
+      materials.push(m);
+      return { status: 201, body: m };
+    }
+    const mat = /^\/api\/materials\/([^/]+)$/.exec(path);
+    if (method === "PATCH" && mat) {
+      const m = materials.find((x) => x.id === mat[1]);
+      if (!m) return { status: 404, body: { error: "not_found" } };
+      const b = body as MaterialInput;
+      if (materials.some((x) => x.id !== m.id && sameName(x.name, b.name))) return { status: 409, body: { error: "duplicate_name" } };
+      Object.assign(m, { name: b.name, name_am: b.name_am, bag_qty: b.bag_qty, active: b.active ?? m.active });
+      return { status: 200, body: m };
+    }
+
+    if (method === "GET" && path === "/api/products") return { status: 200, body: products };
+    if (method === "POST" && path === "/api/products") {
+      const b = body as ProductInput;
+      if (products.some((p) => sameName(p.name, b.name))) return { status: 409, body: { error: "duplicate_name" } };
+      if (!positive(b.package_qty)) return { status: 422, body: { error: "invalid_quantity" } };
+      const p: Product = { id: `p${nextId++}`, name: b.name, name_am: b.name_am, sale_unit: b.sale_unit, package_qty: b.package_qty, weight_per_piece_g: b.weight_per_piece_g, active: true, colours: [] };
+      products.push(p);
+      return { status: 201, body: p };
+    }
+    const prod = /^\/api\/products\/([^/]+)$/.exec(path);
+    if (method === "PATCH" && prod) {
+      const p = products.find((x) => x.id === prod[1]);
+      if (!p) return { status: 404, body: { error: "not_found" } };
+      const b = body as ProductInput;
+      if (products.some((x) => x.id !== p.id && sameName(x.name, b.name))) return { status: 409, body: { error: "duplicate_name" } };
+      if (b.sale_unit !== p.sale_unit && p.colours.some((c) => c.active_version !== null)) return { status: 409, body: { error: "unit_locked" } };
+      if (!positive(b.package_qty)) return { status: 422, body: { error: "invalid_quantity" } };
+      Object.assign(p, { name: b.name, name_am: b.name_am, sale_unit: b.sale_unit, package_qty: b.package_qty, weight_per_piece_g: b.weight_per_piece_g, active: b.active ?? p.active });
+      return { status: 200, body: p };
+    }
+    const addColour = /^\/api\/products\/([^/]+)\/colours$/.exec(path);
+    if (method === "POST" && addColour) {
+      const p = products.find((x) => x.id === addColour[1]);
+      if (!p) return { status: 404, body: { error: "not_found" } };
+      const b = body as { name: string; name_am: string };
+      if (p.colours.some((c) => sameName(c.name, b.name))) return { status: 409, body: { error: "duplicate_name" } };
+      const c: Colour = { id: `c${nextId++}`, product_id: p.id, name: b.name, name_am: b.name_am, active: true, active_version: null };
+      p.colours.push(c);
+      return { status: 201, body: c };
+    }
+    const col = /^\/api\/colours\/([^/]+)$/.exec(path);
+    if (method === "PATCH" && col) {
+      for (const p of products) {
+        const c = p.colours.find((x) => x.id === col[1]);
+        if (!c) continue;
+        const b = body as { name: string; name_am: string; active?: boolean };
+        if (p.colours.some((x) => x.id !== c.id && sameName(x.name, b.name))) return { status: 409, body: { error: "duplicate_name" } };
+        Object.assign(c, { name: b.name, name_am: b.name_am, active: b.active ?? c.active });
+        return { status: 200, body: c };
+      }
+      return { status: 404, body: { error: "not_found" } };
+    }
+    return { status: 404, body: { error: "not_found" } };
+  }
 
   function handle(method: string, path: string, body?: unknown): Reply {
     calls.push({ method, path, body });
@@ -103,6 +183,9 @@ export function createFakeServer(options: FakeOptions = {}) {
       return { status: 201, body: {} };
     }
 
+    const master = masterHandle(method, path, body);
+    if (master) return master;
+
     const patch = /^\/api\/users\/([^/]+)$/.exec(path);
     if (method === "PATCH" && patch) {
       const target = users.find((x) => x.id === patch[1]);
@@ -128,7 +211,7 @@ export function createFakeServer(options: FakeOptions = {}) {
     return { status: 404, body: { error: "not_found" } };
   }
 
-  return { handle, calls, users, currentPassword };
+  return { handle, calls, users, materials, products, currentPassword };
 }
 
 /** A fetch() that answers from the fake server. */

@@ -5,6 +5,9 @@ import { ForcedPasswordPage } from "./features/account/ForcedPasswordPage";
 import { PreferencesSync } from "./features/account/PreferencesSync";
 import { LoginPage } from "./features/auth/LoginPage";
 import { useMe } from "./features/auth/useSession";
+import { MaterialsPage } from "./features/masterdata/MaterialsPage";
+import { ProductPage } from "./features/masterdata/ProductPage";
+import { ProductsPage } from "./features/masterdata/ProductsPage";
 import { UsersPage } from "./features/users/UsersPage";
 
 export default function App() {
@@ -28,13 +31,17 @@ export default function App() {
   }
 
   const admin = user.permissions.includes("users.manage");
+  const reader = user.permissions.includes("masterdata.read");
   return (
     <BrowserRouter>
       <PreferencesSync user={user} />
       <Routes>
         <Route path="/users" element={admin ? <UsersPage me={user} /> : <Navigate to="/account" replace />} />
+        <Route path="/products" element={reader ? <ProductsPage me={user} /> : <Navigate to="/account" replace />} />
+        <Route path="/products/:id" element={reader ? <ProductPage me={user} /> : <Navigate to="/account" replace />} />
+        <Route path="/materials" element={reader ? <MaterialsPage me={user} /> : <Navigate to="/account" replace />} />
         <Route path="/account" element={<AccountPage me={user} />} />
-        <Route path="*" element={<Navigate to={admin ? "/users" : "/account"} replace />} />
+        <Route path="*" element={<Navigate to={admin ? "/users" : reader ? "/products" : "/account"} replace />} />
       </Routes>
     </BrowserRouter>
   );

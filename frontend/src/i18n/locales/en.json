@@ -147,7 +147,10 @@
     "main": "Main menu",
     "menu": "Menu",
     "users": "Users",
-    "account": "Account"
+    "account": "Account",
+    "products": "Products",
+    "materials": "Materials",
+    "masterData": "Master data"
   },
   "users": {
     "summary_one": "{{count}} person · {{active}} active",
@@ -243,6 +246,126 @@
       "passwordChangeRequired": "You must choose a new password first.",
       "network": "No connection to the server. Check the network and try again.",
       "other": "Try again in a moment. If it keeps happening, tell your administrator."
+    }
+  },
+  "master": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "save": "Save changes",
+    "retire": "Retire",
+    "reactivate": "Reactivate",
+    "optional": "optional",
+    "loading": "Loading",
+    "breadcrumb": "Breadcrumb",
+    "retiredChip": "Retired",
+    "activeChip": "Active",
+    "nameEn": "Name in English",
+    "nameAm": "Name in Amharic",
+    "units": {
+      "piece": "Piece",
+      "kg": "Kilogram",
+      "pieceCap": "Piece",
+      "kgCap": "Kilogram",
+      "pieces": "pieces",
+      "kgPerBag": "kg per bag"
+    },
+    "loadError": {
+      "title": "Could not load the list.",
+      "body": "Check the connection and try again.",
+      "retry": "Try again"
+    },
+    "errors": {
+      "title": "Something went wrong.",
+      "nameRequired": "Enter the name in English.",
+      "nameAmRequired": "Enter the name in Amharic.",
+      "duplicateName": "This name is already in use.",
+      "invalidQuantity": "Enter a number above zero, such as 25 or 0.5.",
+      "invalidInput": "Check the fields and try again.",
+      "unitLocked": "The unit cannot change once a recipe exists.",
+      "notFound": "This no longer exists. Reload the page.",
+      "versionConflict": "Someone else saved first. Reload and try again.",
+      "network": "No connection to the server. Check the network and try again.",
+      "other": "Try again in a moment. If it keeps happening, tell your administrator."
+    },
+    "materials": {
+      "add": "Add material",
+      "edit": "Edit material",
+      "count_one": "{{count}} material",
+      "count_other": "{{count}} materials",
+      "intro": "Raw materials and additives that recipes use, bought through purchase orders. Names are kept in both languages.",
+      "emptyTitle": "No materials yet",
+      "emptyBody": "Add the raw materials and additives you buy. Recipes pick their ingredients from this list.",
+      "kind": "Kind",
+      "kinds": {
+        "raw_material": "Raw material",
+        "additive": "Additive"
+      },
+      "kindLocked": "The kind cannot be changed after the material is added.",
+      "bag": "Bag size",
+      "usedIn_one": "Used in {{count}} recipe",
+      "usedIn_other": "Used in {{count}} recipes",
+      "unused": "Not used in any recipe",
+      "retireTitle": "Retire {{name}}?",
+      "retireBody": "It will no longer be offered when writing recipes. Recipes and history that already use it keep it. You can bring it back later.",
+      "openFor": "Open {{name}}",
+      "col": {
+        "material": "Material",
+        "kind": "Kind",
+        "bag": "Bag size",
+        "usedIn": "Used in"
+      },
+      "autoItems": "Finished goods and regrind items are created automatically for every product, colour and regrind source. You do not add them here."
+    },
+    "products": {
+      "add": "Add product",
+      "countProducts_one": "{{count}} product",
+      "countProducts_other": "{{count}} products",
+      "countColours_one": "{{count}} colour",
+      "countColours_other": "{{count}} colours",
+      "emptyTitle": "No products yet",
+      "emptyBody": "Add what Crown makes. Each product gets colours, and each colour gets a recipe.",
+      "col": {
+        "product": "Product",
+        "soldBy": "Sold by",
+        "package": "Package",
+        "colours": "Colours",
+        "status": "Status"
+      },
+      "openFor": "Open {{name}}",
+      "noColours": "No colours yet",
+      "packagePieces": "{{qty}} pieces",
+      "packageKg": "{{qty}} kg bag",
+      "packageNeededPieces": "Enter how many pieces are in one package.",
+      "packageNeededKg": "Enter how many kg are in one bag.",
+      "soldBy": "Sold and counted by",
+      "soldByHelp": "Cannot be changed later, so quantities are never mixed up.",
+      "soldByLocked": "Fixed once a recipe exists, so quantities can never be mixed up.",
+      "package": "One package holds",
+      "weight": "Weight of one piece",
+      "weightHelp": "Used only to convert between pieces and kilograms. A converted figure is always labelled as converted.",
+      "addNext": "Next you add the first colour. A finished goods item is created for each colour automatically.",
+      "notFound": "This product no longer exists.",
+      "backToList": "Back to products",
+      "tabs": "Product sections",
+      "tabDetails": "Details",
+      "tabColours": "Colours and recipes",
+      "saved": "Saved.",
+      "retire": "Retire product",
+      "retireTitle": "Retire {{name}}?",
+      "retireBody": "It will no longer be offered for new orders or recipes. Existing orders, stock and history keep it. You can bring it back later.",
+      "retiredNote": "This product is retired."
+    },
+    "colours": {
+      "add": "Add colour",
+      "rename": "Rename",
+      "renameFor": "Rename {{name}}",
+      "addNote": "A finished goods item is created for this colour automatically. Add its recipe next.",
+      "retireTitle": "Retire {{name}}?",
+      "retireBody": "{{name}} will no longer be offered for new production orders or recipes. Existing orders, stock and history keep it. You can bring it back later.",
+      "emptyTitle": "No colours yet",
+      "emptyBody": "Each colour has its own recipe. Add the first colour to continue.",
+      "recipeInUse": "Version {{version}} · in use",
+      "noRecipe": "No recipe yet"
     }
   }
 }
