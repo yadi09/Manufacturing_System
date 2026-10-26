@@ -19,7 +19,7 @@ This system runs Crown's production chain end to end, from a customer receipt to
 
 **Out of scope for now**
 - Accounting, payroll, prices and invoicing. The system records quantities and receipt numbers only; finance keeps money in its own system.
-- Full HR beyond roles, shifts and attendance for production staff.
+- Full HR beyond roles, shifts and attendance for production staff. Planned later: HR employment management, where every employee has an account and can make requests (for example applying for leave). Until then production staff have no accounts and the shift production manager keeps their records.
 
 **Design principle.** Every rule below is a default that authorized people can override, with a reason where noted and an audit log of who changed what. Business rules are settings, not fixed code, so new products, machines or rule changes need configuration rather than rebuilding.
 
@@ -60,7 +60,7 @@ Each person has one or more roles; roles control what they can see and approve. 
 | Shift production manager / supervisor | Requests daily raw material; updates machine and QC assignments; approves rest rotations; closes the shift report |
 | Store manager (raw material) | Approves and issues raw material; weighs leftovers at handover |
 | Store manager (finished goods) | Approves staging into stock; releases goods against a receipt, sample or pay-later record |
-| Machine operator | Logs material loaded, machine on/off, output and downtime in real time |
+| Machine operator | Has **no account**. Works the machine and is recorded as an employee; the shift production manager enters the logs (material loaded, machine on/off, output, downtime) for them |
 | QC inspector | Inspects output; records finished (pieces or kg) and damaged (kg with reasons) |
 | Purchaser | Edits and approves purchase orders; records receiving |
 | Finance (report user) | Reads daily, weekly and monthly production and reconciliation reports |
@@ -69,7 +69,7 @@ Each person has one or more roles; roles control what they can see and approve. 
 
 **Sample approval** is a separate permission. The cashier creates sample requests and the store manager approves them as delivered when releasing the sample. Both are configurable.
 
-One person can hold several roles (an operator who rotates to QC), and every action is stored with the user, the time and the shift.
+One person can hold several roles, and every action is stored with the user, the time and the shift. Floor staff without an account (operators) are employees, not users: when a manager enters something on their behalf, the entry stores both the manager who typed it and the employee it is about.
 
 **User accounts**
 - Only an administrator creates accounts. People sign in with email and password; there is no self sign-up.
@@ -115,7 +115,7 @@ Every shift runs the same cycle, and every floor action is logged as it happens.
 1. **Shift opens.** The incoming shift confirms the previous shift's handover report: leftover raw material, finished goods, damaged output and work-time. Leftovers are weighed; any difference from the report is recorded and flagged.
 2. **Daily plan.** The system generates a plan per machine from the approved production plan, cycle times, inputs and outputs. The shift production manager can edit it.
 3. **Material request.** The shift production manager requests the day's raw material. The default quantity is daily machine capacity multiplied by the BOM, minus leftovers carried over. The store manager approves and issues it. Material already reserved still needs this approval, so responsibility is traceable.
-4. **Machine run.** Operators log, in real time: material loaded (kg, type, lot), machine on, output, downtime with a reason, machine off. Entries come from a tablet, phone or desktop, by the operator or the supervisor.
+4. **Machine run.** The shift production manager (supervisor) logs, in real time and on behalf of the operators, who have no accounts: material loaded (kg, type, lot), machine on, output, downtime with a reason, machine off. Each entry names the operator it is about. Entries come from a tablet, phone or desktop.
 5. **Quality control.** QC inspects every piece. Finished output is counted in pieces (egg trays) or kg (jar covers). Damaged output is recorded in kg with general reasons from a list, not piece by piece.
 6. **Staging and stock.** Finished output waits in the staging area until the finished goods store manager approves it into stock. Damaged output goes to the recycling workspace.
 7. **Rest rotation.** After a set time (currently 1 hour), the system prompts that a machine operator should rotate to QC. The operator tells the supervisor, who updates the assignment. Every change is logged with a time.
@@ -235,7 +235,7 @@ Adding a product or changing a rule should be a settings change. The system is b
 | Damage reason list | Editable list |
 | Sample approval | Cashier requests, store manager approves as delivered; no limit |
 | Pay-later | Allowed; cashier can record it; no limits for now |
-| Data entry | By operator or supervisor, on any device |
+| Data entry | By the shift production manager (supervisor) on behalf of operators, on any device. Operators do not have accounts |
 
 For a new product, an administrator defines the product, unit, package size, BOM (with color variants), workspace, cycle time and QC reasons. Nothing in the flow is specific to egg trays or jar covers.
 

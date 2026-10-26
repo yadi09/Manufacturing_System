@@ -59,7 +59,7 @@ The database has eight groups of tables. The ones that record what happened are 
 - Floor events, stock movements and audit rows are never edited or deleted. A mistake is fixed by a new reversing entry with a reason.
 - Available stock is calculated as on-hand minus reserved, so the two states can never disagree.
 - Every delivery row must point to a receipt, a sample request or a pay-later record. A release with none of these is rejected.
-- Every floor event carries the user, workspace, shift, time and a client-generated key, so an entry sent twice after an offline sync is stored once.
+- Every floor event carries the user who entered it, the employee it concerns (operators have no accounts), workspace, shift, time and a client-generated key, so an entry sent twice after an offline sync is stored once.
 - Every quantity has a unit, taken from the product, so kg and pieces are never mixed silently.
 
 ## Logic to get right
@@ -127,7 +127,8 @@ Before each milestone's screens are built, mockups are produced as pictures that
 | Material approval and issue; handover weighing | Raw material store manager | Tablet or PC | 4 |
 | Plan board with edits and reasons; waiting orders; weekly roster | Production manager | PC or tablet | 4, 7 |
 | Daily material request; shift handover report; rest rotation prompts and assignments | Shift production manager | Tablet | 4, 7 |
-| Machine entry (material loaded, on, output, off, downtime reason); QC entry (finished and damaged kg with reasons) | Operators and QC inspectors | Tablet or phone | 4 |
+| Machine entry (material loaded, on, output, off, downtime reason, naming the operator it is about) | Shift production manager, on behalf of operators (who have no accounts) | Tablet or phone | 4 |
+| QC entry (finished and damaged kg with reasons) | QC inspectors, or the shift production manager if QC staff also have no accounts (open question) | Tablet or phone | 4 |
 | Purchase orders: edit (including expected arrival per line), approve, receive; purchasing view with expected arrivals | Purchaser | PC | 3 |
 | Owner dashboard, live board, reports | Owner or GM | Any device | 5 |
 | Reconciliation, receivables, weekly and monthly production reports | Finance | PC | 6 |
