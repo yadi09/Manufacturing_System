@@ -20,6 +20,56 @@ type AuditLog struct {
 	Reason   pgtype.Text        `json:"reason"`
 }
 
+type Bom struct {
+	ID         pgtype.UUID        `json:"id"`
+	VariantID  pgtype.UUID        `json:"variant_id"`
+	Version    int32              `json:"version"`
+	Status     string             `json:"status"`
+	Reason     string             `json:"reason"`
+	CreatedBy  string             `json:"created_by"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+	ReplacedAt pgtype.Timestamptz `json:"replaced_at"`
+	WarnPct    pgtype.Numeric     `json:"warn_pct"`
+	CritPct    pgtype.Numeric     `json:"crit_pct"`
+}
+
+type BomLine struct {
+	BomID  pgtype.UUID    `json:"bom_id"`
+	ItemID pgtype.UUID    `json:"item_id"`
+	Qty    pgtype.Numeric `json:"qty"`
+	Unit   string         `json:"unit"`
+}
+
+type BomRegrindRule struct {
+	BomID           pgtype.UUID    `json:"bom_id"`
+	SourceProductID pgtype.UUID    `json:"source_product_id"`
+	MaxBlendPct     pgtype.Numeric `json:"max_blend_pct"`
+}
+
+type Item struct {
+	ID              pgtype.UUID        `json:"id"`
+	Kind            string             `json:"kind"`
+	Name            pgtype.Text        `json:"name"`
+	NameAm          pgtype.Text        `json:"name_am"`
+	Unit            string             `json:"unit"`
+	BagQty          pgtype.Numeric     `json:"bag_qty"`
+	VariantID       pgtype.UUID        `json:"variant_id"`
+	SourceProductID pgtype.UUID        `json:"source_product_id"`
+	Active          bool               `json:"active"`
+	CreatedAt       pgtype.Timestamptz `json:"created_at"`
+}
+
+type Product struct {
+	ID              pgtype.UUID        `json:"id"`
+	Name            string             `json:"name"`
+	NameAm          string             `json:"name_am"`
+	SaleUnit        string             `json:"sale_unit"`
+	PackageQty      pgtype.Numeric     `json:"package_qty"`
+	WeightPerPieceG pgtype.Numeric     `json:"weight_per_piece_g"`
+	Active          bool               `json:"active"`
+	CreatedAt       pgtype.Timestamptz `json:"created_at"`
+}
+
 type Role struct {
 	Key           string `json:"key"`
 	Name          string `json:"name"`
@@ -46,6 +96,13 @@ type Setting struct {
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
+type Unit struct {
+	Key    string `json:"key"`
+	Kind   string `json:"kind"`
+	Name   string `json:"name"`
+	NameAm string `json:"name_am"`
+}
+
 type User struct {
 	ID                 pgtype.UUID        `json:"id"`
 	Email              string             `json:"email"`
@@ -61,4 +118,13 @@ type User struct {
 type UserRole struct {
 	UserID  pgtype.UUID `json:"user_id"`
 	RoleKey string      `json:"role_key"`
+}
+
+type Variant struct {
+	ID        pgtype.UUID        `json:"id"`
+	ProductID pgtype.UUID        `json:"product_id"`
+	Name      string             `json:"name"`
+	NameAm    string             `json:"name_am"`
+	Active    bool               `json:"active"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
 }

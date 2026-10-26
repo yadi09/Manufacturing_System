@@ -32,3 +32,24 @@ func TestVerifyRejectsMalformedHashes(t *testing.T) {
 		}
 	}
 }
+
+func TestCheapHashingStillVerifiesAndRealHashesStillVerify(t *testing.T) {
+	real, err := HashPassword("correct horse battery") // real parameters
+	if err != nil {
+		t.Fatal(err)
+	}
+	UseCheapHashingInTests()
+	t.Cleanup(func() { argonMemory, argonTime = 19*1024, 2 })
+	cheap, err := HashPassword("correct horse battery")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, h := range []string{real, cheap} {
+		if !VerifyPassword("correct horse battery", h) || VerifyPassword("wrong horse battery", h) {
+			t.Fatalf("hash does not verify: %s", h)
+		}
+	}
+	if !strings.Contains(real, "m=19456,t=2") || !strings.Contains(cheap, "m=8,t=1") {
+		t.Fatalf("hashes record their own parameters: %s / %s", real, cheap)
+	}
+}
