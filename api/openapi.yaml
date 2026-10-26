@@ -77,6 +77,21 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /api/auth/preferences:
+    patch:
+      operationId: setPreferences
+      summary: Save your own language and calendar; only the fields sent change. Allowed even while a password change is pending
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Preferences"
+      responses:
+        "204":
+          description: Saved
+        "422":
+          description: Unknown value (error invalid_preference)
   /api/auth/password:
     post:
       operationId: changeOwnPassword
@@ -230,6 +245,8 @@ components:
           type: string
         full_name:
           type: string
+        preferences:
+          $ref: "#/components/schemas/Preferences"
         must_change_password:
           type: boolean
           description: When true the API refuses everything except /api/auth/me, /api/auth/password and logout, with 403 password_change_required, until the password is changed
@@ -319,3 +336,15 @@ components:
           type: array
           items:
             type: string
+    Preferences:
+      type: object
+      description: A person's saved display choices. null means not chosen yet; the device value is then used.
+      properties:
+        language:
+          type: string
+          nullable: true
+          enum: [en, am]
+        calendar:
+          type: string
+          nullable: true
+          enum: [ethiopian, gregorian]

@@ -54,6 +54,8 @@ type User struct {
 	Active             bool               `json:"active"`
 	CreatedAt          pgtype.Timestamptz `json:"created_at"`
 	MustChangePassword bool               `json:"must_change_password"`
+	Language           pgtype.Text        `json:"language"`
+	Calendar           pgtype.Text        `json:"calendar"`
 }
 
 type UserRole struct {

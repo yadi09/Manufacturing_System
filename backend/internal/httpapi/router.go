@@ -49,6 +49,8 @@ func NewRouter(d Deps) http.Handler {
 			r.Post("/logout", h.logout)
 			r.With(RequireAuthEvenIfPasswordMustChange(d.Auth)).Get("/me", h.me)
 			r.With(RequireAuthEvenIfPasswordMustChange(d.Auth)).Post("/password", uh.changeOwnPassword)
+			// Display choices are harmless, and a person who must change the password still needs their language.
+			r.With(RequireAuthEvenIfPasswordMustChange(d.Auth)).Patch("/preferences", uh.setPreferences)
 		})
 		r.Route("/api", func(r chi.Router) {
 			r.Use(RequireAuth(d.Auth), RequirePermission("users.manage"))

@@ -13,6 +13,8 @@ export interface User {
   /** True after a new user or a reset: the API allows only changing the password until it is done. */
   must_change_password: boolean;
   roles: Role[];
+  /** Saved display choices; null means the person has not chosen yet (the device value is used). */
+  preferences: { language: "en" | "am" | null; calendar: "ethiopian" | "gregorian" | null };
   permissions: string[];
 }
 

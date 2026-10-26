@@ -17,6 +17,7 @@ const CASHIER: User = {
   full_name: "Selam Tadesse",
   must_change_password: false,
   permissions: [],
+  preferences: { language: null, calendar: null },
   roles: [{ key: "cashier", name: "Cashier / sales", name_am: "ገንዘብ ተቀባይ / ሽያጭ" }],
 };
 

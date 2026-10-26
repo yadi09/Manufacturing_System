@@ -43,6 +43,8 @@ func writeAuthError(w http.ResponseWriter, err error) {
 		writeError(w, http.StatusUnprocessableEntity, "unknown_role")
 	case errors.Is(err, auth.ErrLastAdmin):
 		writeError(w, http.StatusConflict, "last_admin")
+	case errors.Is(err, auth.ErrInvalidPreference):
+		writeError(w, http.StatusUnprocessableEntity, "invalid_preference")
 	case errors.Is(err, auth.ErrPasswordUnchanged):
 		writeError(w, http.StatusUnprocessableEntity, "password_unchanged")
 	case errors.Is(err, auth.ErrWrongPassword):
@@ -134,6 +136,19 @@ func (h *userHandlers) changeOwnPassword(w http.ResponseWriter, r *http.Request)
 	u, _ := CurrentUser(r.Context())
 	c, _ := r.Cookie(sessionCookie)
 	if err := h.auth.ChangePassword(r.Context(), u.ID, c.Value, req.Current, req.New); err != nil {
+		writeAuthError(w, err)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (h *userHandlers) setPreferences(w http.ResponseWriter, r *http.Request) {
+	var req auth.PreferencesUpdate
+	if !decodeJSON(w, r, &req) {
+		return
+	}
+	u, _ := CurrentUser(r.Context())
+	if err := h.auth.SetPreferences(r.Context(), u.ID, req); err != nil {
 		writeAuthError(w, err)
 		return
 	}

@@ -23,6 +23,12 @@ export function setCalendar(kind: CalendarKind): void {
   listeners.forEach((l) => l());
 }
 
+/** Runs `listener` whenever the calendar choice changes; returns a function that stops it. */
+export function subscribeCalendar(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
 /** The chosen calendar, and a setter. Every screen showing dates updates when it changes. */
 export function useCalendar(): [CalendarKind, (kind: CalendarKind) => void] {
   const kind = useSyncExternalStore(

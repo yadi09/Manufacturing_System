@@ -84,6 +84,22 @@ func (q *Queries) GetUserByID(ctx context.Context, id pgtype.UUID) (GetUserByIDR
 	return i, err
 }
 
+const getUserPreferences = `-- name: GetUserPreferences :one
+SELECT language, calendar FROM users WHERE id = $1
+`
+
+type GetUserPreferencesRow struct {
+	Language pgtype.Text `json:"language"`
+	Calendar pgtype.Text `json:"calendar"`
+}
+
+func (q *Queries) GetUserPreferences(ctx context.Context, id pgtype.UUID) (GetUserPreferencesRow, error) {
+	row := q.db.QueryRow(ctx, getUserPreferences, id)
+	var i GetUserPreferencesRow
+	err := row.Scan(&i.Language, &i.Calendar)
+	return i, err
+}
+
 const listAllUserRoles = `-- name: ListAllUserRoles :many
 SELECT user_id, role_key FROM user_roles ORDER BY role_key
 `
@@ -202,6 +218,21 @@ type UpdatePasswordHashParams struct {
 
 func (q *Queries) UpdatePasswordHash(ctx context.Context, arg UpdatePasswordHashParams) error {
 	_, err := q.db.Exec(ctx, updatePasswordHash, arg.ID, arg.PasswordHash, arg.MustChangePassword)
+	return err
+}
+
+const updateUserPreferences = `-- name: UpdateUserPreferences :exec
+UPDATE users SET language = COALESCE($1, language), calendar = COALESCE($2, calendar) WHERE id = $3
+`
+
+type UpdateUserPreferencesParams struct {
+	Language pgtype.Text `json:"language"`
+	Calendar pgtype.Text `json:"calendar"`
+	ID       pgtype.UUID `json:"id"`
+}
+
+func (q *Queries) UpdateUserPreferences(ctx context.Context, arg UpdateUserPreferencesParams) error {
+	_, err := q.db.Exec(ctx, updateUserPreferences, arg.Language, arg.Calendar, arg.ID)
 	return err
 }
 
