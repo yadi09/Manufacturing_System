@@ -1,0 +1,1291 @@
+{
+  "source": "ICU 78.2 (tz 2025c) through Node v22.22.1 Intl, Ethiopic calendar (Amete Mihret era) and IANA time zones. Not generated from this project's code.",
+  "spot_checks": "Agrees with published dates: Ethiopian Millennium Meskerem 1, 2000 = 2007-09-12; Battle of Adwa Yekatit 23, 1888 = 1896-03-01.",
+  "generator": "scripts/calendar-vectors.mjs",
+  "conventions": "Ethiopian months 1-13 (1 = Meskerem, 13 = Pagume). weekday 0 = Sunday. Gregorian dates are proleptic, ISO YYYY-MM-DD.",
+  "dates": [
+    {
+      "gregorian": "1600-01-01",
+      "ethiopian": {
+        "year": 1592,
+        "month": 4,
+        "day": 25
+      },
+      "weekday": 6,
+      "notes": [
+        "far past"
+      ]
+    },
+    {
+      "gregorian": "1700-03-01",
+      "ethiopian": {
+        "year": 1692,
+        "month": 6,
+        "day": 24
+      },
+      "weekday": 1,
+      "notes": [
+        "far past, after a non-leap Gregorian Feb"
+      ]
+    },
+    {
+      "gregorian": "1896-03-01",
+      "ethiopian": {
+        "year": 1888,
+        "month": 6,
+        "day": 23
+      },
+      "weekday": 0,
+      "notes": [
+        "Battle of Adwa, published as Yekatit 23, 1888"
+      ]
+    },
+    {
+      "gregorian": "1897-09-09",
+      "ethiopian": {
+        "year": 1889,
+        "month": 13,
+        "day": 5
+      },
+      "weekday": 4,
+      "notes": [
+        "last day of 1889"
+      ]
+    },
+    {
+      "gregorian": "1897-09-10",
+      "ethiopian": {
+        "year": 1890,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 5,
+      "notes": [
+        "Meskerem 1, 1890: New Year on 09-10"
+      ]
+    },
+    {
+      "gregorian": "1898-09-09",
+      "ethiopian": {
+        "year": 1890,
+        "month": 13,
+        "day": 5
+      },
+      "weekday": 5,
+      "notes": [
+        "last day of 1890"
+      ]
+    },
+    {
+      "gregorian": "1898-09-10",
+      "ethiopian": {
+        "year": 1891,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 6,
+      "notes": [
+        "Meskerem 1, 1891: New Year on 09-10"
+      ]
+    },
+    {
+      "gregorian": "1899-09-10",
+      "ethiopian": {
+        "year": 1891,
+        "month": 13,
+        "day": 6
+      },
+      "weekday": 0,
+      "notes": [
+        "Pagume 6, leap year 1891",
+        "last day of 1891"
+      ]
+    },
+    {
+      "gregorian": "1899-09-11",
+      "ethiopian": {
+        "year": 1892,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 1,
+      "notes": [
+        "Meskerem 1, 1892: New Year on 09-11"
+      ]
+    },
+    {
+      "gregorian": "1899-12-31",
+      "ethiopian": {
+        "year": 1892,
+        "month": 4,
+        "day": 22
+      },
+      "weekday": 0,
+      "notes": [
+        "before 1900"
+      ]
+    },
+    {
+      "gregorian": "1900-02-28",
+      "ethiopian": {
+        "year": 1892,
+        "month": 6,
+        "day": 21
+      },
+      "weekday": 3,
+      "notes": [
+        "1900 is not a Gregorian leap year"
+      ]
+    },
+    {
+      "gregorian": "1900-03-01",
+      "ethiopian": {
+        "year": 1892,
+        "month": 6,
+        "day": 22
+      },
+      "weekday": 4,
+      "notes": [
+        "1900 is not a Gregorian leap year"
+      ]
+    },
+    {
+      "gregorian": "1900-09-10",
+      "ethiopian": {
+        "year": 1892,
+        "month": 13,
+        "day": 5
+      },
+      "weekday": 1,
+      "notes": [
+        "last day of 1892"
+      ]
+    },
+    {
+      "gregorian": "1900-09-11",
+      "ethiopian": {
+        "year": 1893,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 2,
+      "notes": [
+        "Meskerem 1, 1893: New Year on 09-11"
+      ]
+    },
+    {
+      "gregorian": "1901-09-10",
+      "ethiopian": {
+        "year": 1893,
+        "month": 13,
+        "day": 5
+      },
+      "weekday": 2,
+      "notes": [
+        "last day of 1893"
+      ]
+    },
+    {
+      "gregorian": "1901-09-11",
+      "ethiopian": {
+        "year": 1894,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 3,
+      "notes": [
+        "Meskerem 1, 1894: New Year on 09-11"
+      ]
+    },
+    {
+      "gregorian": "1902-09-10",
+      "ethiopian": {
+        "year": 1894,
+        "month": 13,
+        "day": 5
+      },
+      "weekday": 3,
+      "notes": [
+        "last day of 1894"
+      ]
+    },
+    {
+      "gregorian": "1902-09-11",
+      "ethiopian": {
+        "year": 1895,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 4,
+      "notes": [
+        "Meskerem 1, 1895: New Year on 09-11"
+      ]
+    },
+    {
+      "gregorian": "1903-09-11",
+      "ethiopian": {
+        "year": 1895,
+        "month": 13,
+        "day": 6
+      },
+      "weekday": 5,
+      "notes": [
+        "last day of 1895"
+      ]
+    },
+    {
+      "gregorian": "1903-09-12",
+      "ethiopian": {
+        "year": 1896,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 6,
+      "notes": [
+        "Meskerem 1, 1896: New Year on 09-12"
+      ]
+    },
+    {
+      "gregorian": "2007-09-11",
+      "ethiopian": {
+        "year": 1999,
+        "month": 13,
+        "day": 6
+      },
+      "weekday": 2,
+      "notes": [
+        "Pagume 6, leap year 1999"
+      ]
+    },
+    {
+      "gregorian": "2007-09-12",
+      "ethiopian": {
+        "year": 2000,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 3,
+      "notes": [
+        "Ethiopian Millennium, published as Meskerem 1, 2000"
+      ]
+    },
+    {
+      "gregorian": "2015-09-11",
+      "ethiopian": {
+        "year": 2007,
+        "month": 13,
+        "day": 6
+      },
+      "weekday": 5,
+      "notes": [
+        "last day of 2007"
+      ]
+    },
+    {
+      "gregorian": "2015-09-12",
+      "ethiopian": {
+        "year": 2008,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 6,
+      "notes": [
+        "Meskerem 1, 2008: New Year on 09-12"
+      ]
+    },
+    {
+      "gregorian": "2016-09-10",
+      "ethiopian": {
+        "year": 2008,
+        "month": 13,
+        "day": 5
+      },
+      "weekday": 6,
+      "notes": [
+        "last day of 2008"
+      ]
+    },
+    {
+      "gregorian": "2016-09-11",
+      "ethiopian": {
+        "year": 2009,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 0,
+      "notes": [
+        "Meskerem 1, 2009: New Year on 09-11"
+      ]
+    },
+    {
+      "gregorian": "2017-09-10",
+      "ethiopian": {
+        "year": 2009,
+        "month": 13,
+        "day": 5
+      },
+      "weekday": 0,
+      "notes": [
+        "last day of 2009"
+      ]
+    },
+    {
+      "gregorian": "2017-09-11",
+      "ethiopian": {
+        "year": 2010,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 1,
+      "notes": [
+        "Meskerem 1, 2010: New Year on 09-11"
+      ]
+    },
+    {
+      "gregorian": "2018-09-10",
+      "ethiopian": {
+        "year": 2010,
+        "month": 13,
+        "day": 5
+      },
+      "weekday": 1,
+      "notes": [
+        "last day of 2010"
+      ]
+    },
+    {
+      "gregorian": "2018-09-11",
+      "ethiopian": {
+        "year": 2011,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 2,
+      "notes": [
+        "Meskerem 1, 2011: New Year on 09-11"
+      ]
+    },
+    {
+      "gregorian": "2019-09-11",
+      "ethiopian": {
+        "year": 2011,
+        "month": 13,
+        "day": 6
+      },
+      "weekday": 3,
+      "notes": [
+        "Pagume 6, leap year 2011",
+        "last day of 2011"
+      ]
+    },
+    {
+      "gregorian": "2019-09-12",
+      "ethiopian": {
+        "year": 2012,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 4,
+      "notes": [
+        "Meskerem 1, 2012: New Year on 09-12"
+      ]
+    },
+    {
+      "gregorian": "2020-09-10",
+      "ethiopian": {
+        "year": 2012,
+        "month": 13,
+        "day": 5
+      },
+      "weekday": 4,
+      "notes": [
+        "last day of 2012"
+      ]
+    },
+    {
+      "gregorian": "2020-09-11",
+      "ethiopian": {
+        "year": 2013,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 5,
+      "notes": [
+        "Meskerem 1, 2013: New Year on 09-11"
+      ]
+    },
+    {
+      "gregorian": "2021-09-10",
+      "ethiopian": {
+        "year": 2013,
+        "month": 13,
+        "day": 5
+      },
+      "weekday": 5,
+      "notes": [
+        "last day of 2013"
+      ]
+    },
+    {
+      "gregorian": "2021-09-11",
+      "ethiopian": {
+        "year": 2014,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 6,
+      "notes": [
+        "Meskerem 1, 2014: New Year on 09-11"
+      ]
+    },
+    {
+      "gregorian": "2022-09-10",
+      "ethiopian": {
+        "year": 2014,
+        "month": 13,
+        "day": 5
+      },
+      "weekday": 6,
+      "notes": [
+        "last day of 2014"
+      ]
+    },
+    {
+      "gregorian": "2022-09-11",
+      "ethiopian": {
+        "year": 2015,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 0,
+      "notes": [
+        "Meskerem 1, 2015: New Year on 09-11"
+      ]
+    },
+    {
+      "gregorian": "2022-10-10",
+      "ethiopian": {
+        "year": 2015,
+        "month": 1,
+        "day": 30
+      },
+      "weekday": 1,
+      "notes": [
+        "last day of month, leap year 2015"
+      ]
+    },
+    {
+      "gregorian": "2022-11-09",
+      "ethiopian": {
+        "year": 2015,
+        "month": 2,
+        "day": 30
+      },
+      "weekday": 3,
+      "notes": [
+        "last day of month, leap year 2015"
+      ]
+    },
+    {
+      "gregorian": "2022-12-09",
+      "ethiopian": {
+        "year": 2015,
+        "month": 3,
+        "day": 30
+      },
+      "weekday": 5,
+      "notes": [
+        "last day of month, leap year 2015"
+      ]
+    },
+    {
+      "gregorian": "2023-01-08",
+      "ethiopian": {
+        "year": 2015,
+        "month": 4,
+        "day": 30
+      },
+      "weekday": 0,
+      "notes": [
+        "last day of month, leap year 2015"
+      ]
+    },
+    {
+      "gregorian": "2023-02-07",
+      "ethiopian": {
+        "year": 2015,
+        "month": 5,
+        "day": 30
+      },
+      "weekday": 2,
+      "notes": [
+        "last day of month, leap year 2015"
+      ]
+    },
+    {
+      "gregorian": "2023-03-09",
+      "ethiopian": {
+        "year": 2015,
+        "month": 6,
+        "day": 30
+      },
+      "weekday": 4,
+      "notes": [
+        "last day of month, leap year 2015"
+      ]
+    },
+    {
+      "gregorian": "2023-04-08",
+      "ethiopian": {
+        "year": 2015,
+        "month": 7,
+        "day": 30
+      },
+      "weekday": 6,
+      "notes": [
+        "last day of month, leap year 2015"
+      ]
+    },
+    {
+      "gregorian": "2023-05-08",
+      "ethiopian": {
+        "year": 2015,
+        "month": 8,
+        "day": 30
+      },
+      "weekday": 1,
+      "notes": [
+        "last day of month, leap year 2015"
+      ]
+    },
+    {
+      "gregorian": "2023-06-07",
+      "ethiopian": {
+        "year": 2015,
+        "month": 9,
+        "day": 30
+      },
+      "weekday": 3,
+      "notes": [
+        "last day of month, leap year 2015"
+      ]
+    },
+    {
+      "gregorian": "2023-07-07",
+      "ethiopian": {
+        "year": 2015,
+        "month": 10,
+        "day": 30
+      },
+      "weekday": 5,
+      "notes": [
+        "last day of month, leap year 2015"
+      ]
+    },
+    {
+      "gregorian": "2023-08-06",
+      "ethiopian": {
+        "year": 2015,
+        "month": 11,
+        "day": 30
+      },
+      "weekday": 0,
+      "notes": [
+        "last day of month, leap year 2015"
+      ]
+    },
+    {
+      "gregorian": "2023-09-05",
+      "ethiopian": {
+        "year": 2015,
+        "month": 12,
+        "day": 30
+      },
+      "weekday": 2,
+      "notes": [
+        "last day of month, leap year 2015"
+      ]
+    },
+    {
+      "gregorian": "2023-09-11",
+      "ethiopian": {
+        "year": 2015,
+        "month": 13,
+        "day": 6
+      },
+      "weekday": 1,
+      "notes": [
+        "last day of month, leap year 2015",
+        "Pagume 6, leap year 2015",
+        "last day of 2015"
+      ]
+    },
+    {
+      "gregorian": "2023-09-12",
+      "ethiopian": {
+        "year": 2016,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 2,
+      "notes": [
+        "Meskerem 1, 2016: New Year on 09-12"
+      ]
+    },
+    {
+      "gregorian": "2023-10-11",
+      "ethiopian": {
+        "year": 2016,
+        "month": 1,
+        "day": 30
+      },
+      "weekday": 3,
+      "notes": [
+        "last day of month, common year 2016"
+      ]
+    },
+    {
+      "gregorian": "2023-11-10",
+      "ethiopian": {
+        "year": 2016,
+        "month": 2,
+        "day": 30
+      },
+      "weekday": 5,
+      "notes": [
+        "last day of month, common year 2016"
+      ]
+    },
+    {
+      "gregorian": "2023-12-10",
+      "ethiopian": {
+        "year": 2016,
+        "month": 3,
+        "day": 30
+      },
+      "weekday": 0,
+      "notes": [
+        "last day of month, common year 2016"
+      ]
+    },
+    {
+      "gregorian": "2024-01-09",
+      "ethiopian": {
+        "year": 2016,
+        "month": 4,
+        "day": 30
+      },
+      "weekday": 2,
+      "notes": [
+        "last day of month, common year 2016"
+      ]
+    },
+    {
+      "gregorian": "2024-02-08",
+      "ethiopian": {
+        "year": 2016,
+        "month": 5,
+        "day": 30
+      },
+      "weekday": 4,
+      "notes": [
+        "last day of month, common year 2016"
+      ]
+    },
+    {
+      "gregorian": "2024-03-09",
+      "ethiopian": {
+        "year": 2016,
+        "month": 6,
+        "day": 30
+      },
+      "weekday": 6,
+      "notes": [
+        "last day of month, common year 2016"
+      ]
+    },
+    {
+      "gregorian": "2024-04-08",
+      "ethiopian": {
+        "year": 2016,
+        "month": 7,
+        "day": 30
+      },
+      "weekday": 1,
+      "notes": [
+        "last day of month, common year 2016"
+      ]
+    },
+    {
+      "gregorian": "2024-05-08",
+      "ethiopian": {
+        "year": 2016,
+        "month": 8,
+        "day": 30
+      },
+      "weekday": 3,
+      "notes": [
+        "last day of month, common year 2016"
+      ]
+    },
+    {
+      "gregorian": "2024-06-07",
+      "ethiopian": {
+        "year": 2016,
+        "month": 9,
+        "day": 30
+      },
+      "weekday": 5,
+      "notes": [
+        "last day of month, common year 2016"
+      ]
+    },
+    {
+      "gregorian": "2024-07-07",
+      "ethiopian": {
+        "year": 2016,
+        "month": 10,
+        "day": 30
+      },
+      "weekday": 0,
+      "notes": [
+        "last day of month, common year 2016"
+      ]
+    },
+    {
+      "gregorian": "2024-08-06",
+      "ethiopian": {
+        "year": 2016,
+        "month": 11,
+        "day": 30
+      },
+      "weekday": 2,
+      "notes": [
+        "last day of month, common year 2016"
+      ]
+    },
+    {
+      "gregorian": "2024-09-05",
+      "ethiopian": {
+        "year": 2016,
+        "month": 12,
+        "day": 30
+      },
+      "weekday": 4,
+      "notes": [
+        "last day of month, common year 2016"
+      ]
+    },
+    {
+      "gregorian": "2024-09-10",
+      "ethiopian": {
+        "year": 2016,
+        "month": 13,
+        "day": 5
+      },
+      "weekday": 2,
+      "notes": [
+        "last day of month, common year 2016",
+        "last day of 2016"
+      ]
+    },
+    {
+      "gregorian": "2024-09-11",
+      "ethiopian": {
+        "year": 2017,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 3,
+      "notes": [
+        "Meskerem 1, 2017: New Year on 09-11"
+      ]
+    },
+    {
+      "gregorian": "2025-09-10",
+      "ethiopian": {
+        "year": 2017,
+        "month": 13,
+        "day": 5
+      },
+      "weekday": 3,
+      "notes": [
+        "last day of 2017"
+      ]
+    },
+    {
+      "gregorian": "2025-09-11",
+      "ethiopian": {
+        "year": 2018,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 4,
+      "notes": [
+        "Meskerem 1, 2018: New Year on 09-11"
+      ]
+    },
+    {
+      "gregorian": "2026-09-10",
+      "ethiopian": {
+        "year": 2018,
+        "month": 13,
+        "day": 5
+      },
+      "weekday": 4,
+      "notes": [
+        "last day of 2018"
+      ]
+    },
+    {
+      "gregorian": "2026-09-11",
+      "ethiopian": {
+        "year": 2019,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 5,
+      "notes": [
+        "Meskerem 1, 2019: New Year on 09-11"
+      ]
+    },
+    {
+      "gregorian": "2026-10-19",
+      "ethiopian": {
+        "year": 2019,
+        "month": 2,
+        "day": 9
+      },
+      "weekday": 1,
+      "notes": [
+        "around today"
+      ]
+    },
+    {
+      "gregorian": "2027-09-11",
+      "ethiopian": {
+        "year": 2019,
+        "month": 13,
+        "day": 6
+      },
+      "weekday": 6,
+      "notes": [
+        "Pagume 6, leap year 2019",
+        "last day of 2019"
+      ]
+    },
+    {
+      "gregorian": "2027-09-12",
+      "ethiopian": {
+        "year": 2020,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 0,
+      "notes": [
+        "Meskerem 1, 2020: New Year on 09-12"
+      ]
+    },
+    {
+      "gregorian": "2028-09-10",
+      "ethiopian": {
+        "year": 2020,
+        "month": 13,
+        "day": 5
+      },
+      "weekday": 0,
+      "notes": [
+        "last day of 2020"
+      ]
+    },
+    {
+      "gregorian": "2028-09-11",
+      "ethiopian": {
+        "year": 2021,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 1,
+      "notes": [
+        "Meskerem 1, 2021: New Year on 09-11"
+      ]
+    },
+    {
+      "gregorian": "2029-09-10",
+      "ethiopian": {
+        "year": 2021,
+        "month": 13,
+        "day": 5
+      },
+      "weekday": 1,
+      "notes": [
+        "last day of 2021"
+      ]
+    },
+    {
+      "gregorian": "2029-09-11",
+      "ethiopian": {
+        "year": 2022,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 2,
+      "notes": [
+        "Meskerem 1, 2022: New Year on 09-11"
+      ]
+    },
+    {
+      "gregorian": "2031-09-11",
+      "ethiopian": {
+        "year": 2023,
+        "month": 13,
+        "day": 6
+      },
+      "weekday": 4,
+      "notes": [
+        "Pagume 6, leap year 2023"
+      ]
+    },
+    {
+      "gregorian": "2097-09-10",
+      "ethiopian": {
+        "year": 2089,
+        "month": 13,
+        "day": 5
+      },
+      "weekday": 2,
+      "notes": [
+        "last day of 2089"
+      ]
+    },
+    {
+      "gregorian": "2097-09-11",
+      "ethiopian": {
+        "year": 2090,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 3,
+      "notes": [
+        "Meskerem 1, 2090: New Year on 09-11"
+      ]
+    },
+    {
+      "gregorian": "2098-09-10",
+      "ethiopian": {
+        "year": 2090,
+        "month": 13,
+        "day": 5
+      },
+      "weekday": 3,
+      "notes": [
+        "last day of 2090"
+      ]
+    },
+    {
+      "gregorian": "2098-09-11",
+      "ethiopian": {
+        "year": 2091,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 4,
+      "notes": [
+        "Meskerem 1, 2091: New Year on 09-11"
+      ]
+    },
+    {
+      "gregorian": "2099-09-11",
+      "ethiopian": {
+        "year": 2091,
+        "month": 13,
+        "day": 6
+      },
+      "weekday": 5,
+      "notes": [
+        "last day of 2091"
+      ]
+    },
+    {
+      "gregorian": "2099-09-12",
+      "ethiopian": {
+        "year": 2092,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 6,
+      "notes": [
+        "Meskerem 1, 2092: New Year on 09-12"
+      ]
+    },
+    {
+      "gregorian": "2100-02-28",
+      "ethiopian": {
+        "year": 2092,
+        "month": 6,
+        "day": 20
+      },
+      "weekday": 0,
+      "notes": [
+        "2100 is not a Gregorian leap year"
+      ]
+    },
+    {
+      "gregorian": "2100-03-01",
+      "ethiopian": {
+        "year": 2092,
+        "month": 6,
+        "day": 21
+      },
+      "weekday": 1,
+      "notes": [
+        "2100 is not a Gregorian leap year"
+      ]
+    },
+    {
+      "gregorian": "2100-09-11",
+      "ethiopian": {
+        "year": 2092,
+        "month": 13,
+        "day": 5
+      },
+      "weekday": 6,
+      "notes": [
+        "last day of 2092"
+      ]
+    },
+    {
+      "gregorian": "2100-09-12",
+      "ethiopian": {
+        "year": 2093,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 0,
+      "notes": [
+        "Meskerem 1, 2093: New Year on 09-12"
+      ]
+    },
+    {
+      "gregorian": "2101-09-11",
+      "ethiopian": {
+        "year": 2093,
+        "month": 13,
+        "day": 5
+      },
+      "weekday": 0,
+      "notes": [
+        "last day of 2093"
+      ]
+    },
+    {
+      "gregorian": "2101-09-12",
+      "ethiopian": {
+        "year": 2094,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 1,
+      "notes": [
+        "Meskerem 1, 2094: New Year on 09-12"
+      ]
+    },
+    {
+      "gregorian": "2102-09-11",
+      "ethiopian": {
+        "year": 2094,
+        "month": 13,
+        "day": 5
+      },
+      "weekday": 1,
+      "notes": [
+        "last day of 2094"
+      ]
+    },
+    {
+      "gregorian": "2102-09-12",
+      "ethiopian": {
+        "year": 2095,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 2,
+      "notes": [
+        "Meskerem 1, 2095: New Year on 09-12"
+      ]
+    },
+    {
+      "gregorian": "2103-09-12",
+      "ethiopian": {
+        "year": 2095,
+        "month": 13,
+        "day": 6
+      },
+      "weekday": 3,
+      "notes": [
+        "last day of 2095"
+      ]
+    },
+    {
+      "gregorian": "2103-09-13",
+      "ethiopian": {
+        "year": 2096,
+        "month": 1,
+        "day": 1
+      },
+      "weekday": 4,
+      "notes": [
+        "Meskerem 1, 2096: New Year on 09-13"
+      ]
+    },
+    {
+      "gregorian": "2107-09-12",
+      "ethiopian": {
+        "year": 2099,
+        "month": 13,
+        "day": 6
+      },
+      "weekday": 1,
+      "notes": [
+        "Pagume 6, leap year 2099"
+      ]
+    },
+    {
+      "gregorian": "2399-09-14",
+      "ethiopian": {
+        "year": 2391,
+        "month": 13,
+        "day": 6
+      },
+      "weekday": 2,
+      "notes": [
+        "Pagume 6, leap year 2391"
+      ]
+    },
+    {
+      "gregorian": "2400-02-29",
+      "ethiopian": {
+        "year": 2392,
+        "month": 6,
+        "day": 18
+      },
+      "weekday": 2,
+      "notes": [
+        "Gregorian leap day in a century year"
+      ]
+    },
+    {
+      "gregorian": "2500-12-31",
+      "ethiopian": {
+        "year": 2493,
+        "month": 4,
+        "day": 18
+      },
+      "weekday": 5,
+      "notes": [
+        "far future"
+      ]
+    }
+  ],
+  "instants": [
+    {
+      "utc": "2026-09-10T20:59:59Z",
+      "time_zone": "Africa/Addis_Ababa",
+      "ethiopian": {
+        "year": 2018,
+        "month": 13,
+        "day": 5
+      },
+      "gregorian": "2026-09-10",
+      "note": "23:59:59 local, still the last day of 2018"
+    },
+    {
+      "utc": "2026-09-10T21:00:00Z",
+      "time_zone": "Africa/Addis_Ababa",
+      "ethiopian": {
+        "year": 2019,
+        "month": 1,
+        "day": 1
+      },
+      "gregorian": "2026-09-11",
+      "note": "00:00 local: already New Year 2019 in Ethiopia"
+    },
+    {
+      "utc": "2026-09-10T21:30:00Z",
+      "time_zone": "Africa/Addis_Ababa",
+      "ethiopian": {
+        "year": 2019,
+        "month": 1,
+        "day": 1
+      },
+      "gregorian": "2026-09-11",
+      "note": "late evening UTC is already the next day (New Year) in Ethiopia"
+    },
+    {
+      "utc": "2026-09-10T21:30:00Z",
+      "time_zone": "UTC",
+      "ethiopian": {
+        "year": 2018,
+        "month": 13,
+        "day": 5
+      },
+      "gregorian": "2026-09-10",
+      "note": "same instant in UTC is still the previous day"
+    },
+    {
+      "utc": "2026-10-19T22:15:00Z",
+      "time_zone": "Africa/Addis_Ababa",
+      "ethiopian": {
+        "year": 2019,
+        "month": 2,
+        "day": 10
+      },
+      "gregorian": "2026-10-20",
+      "note": "late evening UTC is the next day in Ethiopia"
+    }
+  ],
+  "shifts": [
+    {
+      "shift_start_utc": "2026-09-10T19:00:00Z",
+      "event_utc": "2026-09-11T00:00:00Z",
+      "time_zone": "Africa/Addis_Ababa",
+      "shift_day": {
+        "gregorian": "2026-09-10",
+        "ethiopian": {
+          "year": 2018,
+          "month": 13,
+          "day": 5
+        }
+      },
+      "note": "night shift 22:00-06:00 local over New Year; event at 03:00 local next day"
+    },
+    {
+      "shift_start_utc": "2026-10-19T19:00:00Z",
+      "event_utc": "2026-10-20T02:30:00Z",
+      "time_zone": "Africa/Addis_Ababa",
+      "shift_day": {
+        "gregorian": "2026-10-19",
+        "ethiopian": {
+          "year": 2019,
+          "month": 2,
+          "day": 9
+        }
+      },
+      "note": "night shift 22:00-06:00 local; event at 05:30 local next day"
+    },
+    {
+      "shift_start_utc": "2026-10-20T03:00:00Z",
+      "event_utc": "2026-10-20T10:00:00Z",
+      "time_zone": "Africa/Addis_Ababa",
+      "shift_day": {
+        "gregorian": "2026-10-20",
+        "ethiopian": {
+          "year": 2019,
+          "month": 2,
+          "day": 10
+        }
+      },
+      "note": "day shift 06:00-14:00 local; event at 13:00 local same day"
+    }
+  ]
+}

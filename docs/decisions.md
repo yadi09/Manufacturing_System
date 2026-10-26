@@ -28,6 +28,7 @@ Handoff for any Claude Code session (desktop app, VS Code extension, terminal). 
 | Hosting | One cloud server. Crown's internet is normal, so offline entry is a safety net for short drops, not the main mode. |
 | Languages | English and Amharic from the first screen; a native Amharic speaker at Crown reviews translations before rollout. |
 | Frontend styling | Tailwind CSS with accessible component primitives. Design system defined and approved first. See "Interface quality" in the plan. |
+| Regrind use | Configurable per BOM instead of fixed: each BOM line says whether regrind is allowed, from which source products and the optional maximum blend. Crown starts with egg tray allowed, jar cover not. Decided 2026-10-19. |
 | Calendar code | Two implementations (Go and TypeScript) tested against one shared `docs/calendar-vectors.json` built from an independent reference. Time zone is a setting, default Africa/Addis_Ababa. Display only; database stays UTC. |
 
 ## Business facts worth remembering (from Crown's weekly report)
@@ -44,7 +45,7 @@ The report is saved at `docs/source/Crown_Weekly_Report.xlsx` and is the source 
 ## Status
 
 - Planning documents: done and pushed to `main`.
-- Milestone 1 (Foundation): in progress on `feature/foundation`. Done: repo skeleton, Go API with `settings` and append-only `audit_log`, frontend shell with English/Amharic and PWA, Playwright screenshot script. Next: shared calendar module (use Opus), then login and roles, the design system, and the first approved mockups.
+- Milestone 1 (Foundation): in progress on `feature/foundation`. Done: repo skeleton, Go API with `settings` and append-only `audit_log`, frontend shell with English/Amharic and PWA, Playwright screenshot script, shared calendar module (Go and TypeScript, tested against ICU vectors, with the shift-day rule). Next: login and roles, the design system, and the first approved mockups.
 - Durations for milestones have not been estimated; give them after milestone 1.
 
 ## Still open
@@ -52,4 +53,5 @@ The report is saved at `docs/source/Crown_Weekly_Report.xlsx` and is the source 
 - Day shift report and egg tray report from Crown (not available yet).
 - Maximum regrind percentage, if Crown has one.
 - Real list of colors, machines and shift times, entered as data when known.
-- Amharic translation review by a native speaker before rollout.
+- Amharic translation review by a native speaker before rollout, including the calendar month, weekday and date-format strings.
+- CI: not set up yet. The screenshot script uses the installed Google Chrome; a CI server needs its own browser setup.

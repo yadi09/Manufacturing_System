@@ -16,7 +16,17 @@ Read these first:
 - Contract: `api/openapi.yaml`; TypeScript API types are generated from it
 - Live updates: Server-Sent Events fed by PostgreSQL LISTEN/NOTIFY
 
-Commands: not set up yet. Add build, test, lint and migration commands here as soon as they exist.
+Commands (run from the repo root). First time: `cp .env.example .env` and `cd frontend && pnpm install`. Needs Go, Node with pnpm, and Docker (PostgreSQL 16 on port 5433).
+- `make db-up` / `make db-down`: start/stop local PostgreSQL (also creates `crown_test`)
+- `make migrate`: apply goose migrations to the dev database (goose runs as a Go tool, nothing to install)
+- `make sqlc`: regenerate Go query code from `backend/queries` and `backend/migrations` (needs `sqlc` on PATH, e.g. `~/go/bin`)
+- `make dev`: start PostgreSQL, migrate, run the API on `:8080` and the web app on `:5173` (Vite proxies `/healthz` to the API); Ctrl+C stops both
+- `make test`: backend tests, including integration tests against real PostgreSQL (`crown_test`, reset on each run) and the calendar tests, then frontend unit tests (vitest)
+- `make lint`: `go vet`, `gofmt` check, then TypeScript and ESLint for the frontend
+- `make screenshots`: Playwright captures each page at 360/768/1280 px in English and Amharic into `frontend/screenshots/` (git-ignored). It uses the installed Google Chrome (`channel: "chrome"`), because Playwright's own Chromium does not support Ubuntu 20.04. A CI server needs its own browser setup (install Chrome, or use Playwright's Chromium on a supported OS).
+- `make calendar-vectors`: regenerate `docs/calendar-vectors.json` from ICU (Node's Intl). Never generate it from our own calendar code.
+
+Calendar: `backend/internal/calendar` (Go) and `frontend/src/lib/calendar` (TypeScript) must stay in step; both test against `docs/calendar-vectors.json`. Display only; the time zone is a setting, default Africa/Addis_Ababa. Month and weekday names live in the translation files.
 
 ## Rules that must hold everywhere
 
@@ -27,7 +37,7 @@ Commands: not set up yet. Add build, test, lint and migration commands here as s
 - **Units.** Every quantity carries a unit from the product (egg tray: piece, jar cover: kg). Never mix kg and pieces silently.
 - **Reservation is transactional.** Locking rows so two sales cannot both take the last stock. Allocation re-runs when material or finished goods arrive, first order first.
 - **Deliveries need a reference.** A delivery must point to a receipt, a sample request or a pay-later record. Paid and delivered quantities stay separate on each order line.
-- **Recycling.** Damaged output returns as regrind with no loss. Jar cover regrind goes only into egg tray production. Report gross throughput and net yield separately and label them.
+- **Recycling.** Damaged output returns as regrind with no loss. Each BOM decides whether regrind may be used, from which source products and up to what blend percentage (Crown: egg tray yes, jar cover no); never hard-code it. Report gross throughput and net yield separately and label them.
 - **Idempotent floor entry.** Every floor event has a client-generated key so offline replays are stored once.
 - **Dates.** Store UTC. Display the Ethiopian calendar by default (13 months), Gregorian optional, through one shared tested conversion module. A shift crossing midnight belongs to the day it started.
 - **Languages.** English and Amharic from the first screen. No hard-coded text; all labels live in translation files. Leave room for longer Amharic text and use an Ethiopic font.

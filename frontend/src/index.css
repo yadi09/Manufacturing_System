@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter Variable", "Noto Sans Ethiopic", system-ui, sans-serif;
+  --color-brand: #0f766e;
+}
+
+body {
+  @apply bg-white text-slate-900 antialiased;
+}

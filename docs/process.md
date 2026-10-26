@@ -35,7 +35,7 @@ Crown makes two products on two machines, plus a recycling workspace. Each is co
 
 **Raw material types**
 - **Virgin material:** imported, bought through purchase orders.
-- **Regrind:** produced by the recycling workspace from damaged output, with no loss. Jar cover damage and egg tray damage both go into **egg tray** production only.
+- **Regrind:** produced by the recycling workspace from damaged output, with no loss. Regrind is a raw material like any other, and each product's BOM decides whether it may be used (see Recycling).
 
 **Stock locations**
 
@@ -96,6 +96,7 @@ A short order is reserved in part and produced for the rest; a missing material 
 - The cashier never creates a production order for a customer order by hand. Manual production orders are only for filling the finished goods store.
 - Reservation priority is first order first, and authorized users can reorder it.
 - A stock-level shortage only raises an alert; a shortage caused by an order creates the draft purchase order.
+- Every purchase order line carries an expected arrival date (ETA), which the purchaser can edit. The order's expected arrival is shown on the purchase order and in the purchasing view.
 - After the production manager approves a plan, any change needs a reason and is logged.
 
 ## Daily shift operations
@@ -117,7 +118,7 @@ Every shift runs the same cycle, and every floor action is logged as it happens.
 
 Damaged output returns as regrind with no loss, so the system tracks two views of the same material and never counts one kilogram as new virgin input.
 
-**Worked example.** A machine takes 100 kg of virgin material and produces 90 kg finished and 10 kg damaged. The 10 kg goes to the recycling workspace and comes back as 10 kg of regrind, which is loaded into an egg tray run later.
+**Worked example.** A machine takes 100 kg of virgin material and produces 90 kg finished and 10 kg damaged. The 10 kg goes to the recycling workspace and comes back as 10 kg of regrind, which is loaded later into a product whose BOM allows it (at Crown today, egg trays).
 
 | View | What it counts | Example result | Used for |
 | --- | --- | --- | --- |
@@ -127,8 +128,8 @@ Damaged output returns as regrind with no loss, so the system tracks two views o
 **Rules**
 - Virgin and regrind are separate stock items with their own lots.
 - Recycling is its own workspace record: damaged kg in, regrind kg out. With no loss the two match; any difference is flagged.
-- Jar cover damage and egg tray damage both become regrind for **egg tray** production only.
-- The BOM can allow a regrind blend, with an optional maximum percentage per product (the percentage is still to be confirmed).
+- Where regrind may go is set on each BOM, not fixed in the system. A BOM line says whether regrind is allowed, which regrind (by source product) and an optional maximum blend percentage. A run or material request that uses regrind on a BOM that does not allow it is rejected.
+- Crown's starting setup: the egg tray BOM allows regrind from egg tray and jar cover damage; the jar cover BOM does not allow regrind. Changing this is a BOM edit, logged in the audit log.
 - Every damaged kg keeps its reason list, shift, machine and operator, so waste can be traced to its source.
 - Reports always state whether they show gross or net numbers.
 
@@ -201,7 +202,7 @@ The owner can open one screen and see what is happening now, what happened so fa
 | Daily, weekly, monthly production | Owner, finance | Output by product, gross and net yield, damage by reason |
 | Reconciliation | Finance | Paid vs. delivered vs. produced, samples, receivables |
 | Performance | Owner, production manager | Per machine, shift and person |
-| Purchasing | Purchaser, owner | Open purchase orders, arrivals, shortages |
+| Purchasing | Purchaser, owner | Open purchase orders with expected arrival dates, arrivals, shortages |
 
 **Offline use.** Data entry screens should save entries when the connection or power drops and sync when it returns, and power cuts are logged as a downtime reason.
 
@@ -220,7 +221,7 @@ Adding a product or changing a rule should be a settings change. The system is b
 | Shift rotation | Weekly rotation across the configured shifts (two or three, each with start and end time) |
 | Package size | Egg tray: fixed pieces per package; jar cover: fixed kg per bag |
 | Unit of measure per product | Egg tray: piece; jar cover: kg |
-| Regrind rules | Destination product and maximum blend percentage per BOM |
+| Regrind rules | Per BOM: regrind allowed or not, which source products, optional maximum blend percentage. Crown: egg tray allows, jar cover does not |
 | BOM variance tolerance | Alert at ±5% per product, critical at ±10% |
 | Damage reason list | Editable list |
 | Sample approval | Cashier requests, store manager approves as delivered; no limit |
@@ -268,7 +269,7 @@ All earlier open points and the questions from the weekly report are decided; tw
 
 | Topic | Decision |
 | --- | --- |
-| Material compatibility | Egg tray and jar cover material is compatible, so jar cover regrind can go into egg trays. No maximum regrind percentage given yet; the setting stays empty (no cap) until Crown confirms one. |
+| Material compatibility | Egg tray and jar cover material is compatible, so jar cover regrind can go into egg trays. Whether a product may use regrind is set on its BOM (Crown: egg tray yes, jar cover no). No maximum regrind percentage given yet; the setting stays empty (no cap) until Crown confirms one. |
 | Free samples | The cashier creates a request, the store manager releases the sample and marks it delivered. No limit for now; roles stay configurable. |
 | Pay-later | The cashier can record it. No limit for now; to be revisited if the business needs it. |
 | Who creates orders | Only the finance cashier, through the receipt. No portal or other sales role for now. |

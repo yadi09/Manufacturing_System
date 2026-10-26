@@ -1,0 +1,34 @@
+openapi: 3.0.3
+info:
+  title: Crown Manufacturing API
+  version: 0.1.0
+paths:
+  /healthz:
+    get:
+      operationId: getHealth
+      summary: Liveness and database check
+      responses:
+        "200":
+          description: Service and database are healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+        "503":
+          description: Database unreachable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+components:
+  schemas:
+    Health:
+      type: object
+      required: [status, database]
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded]
+        database:
+          type: string
+          enum: [up, down]
