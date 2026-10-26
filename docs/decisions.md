@@ -29,6 +29,8 @@ Handoff for any Claude Code session (desktop app, VS Code extension, terminal). 
 | Languages | English and Amharic from the first screen; a native Amharic speaker at Crown reviews translations before rollout. |
 | Frontend styling | Tailwind CSS with accessible component primitives. Design system defined and approved first. See "Interface quality" in the plan. |
 | Regrind use | Configurable per BOM instead of fixed: each BOM line says whether regrind is allowed, from which source products and the optional maximum blend. Crown starts with egg tray allowed, jar cover not. Decided 2026-10-19. |
+| Sign-in | Email and password (owner's choice, 2026-10-19). Argon2id hashes, minimum 10 characters. Server-side sessions in the database, 12 hours, HttpOnly SameSite=Lax cookie (a stolen cookie can be revoked; deactivating a user ends access at once). Roles and their permissions are data (`roles`, `role_permissions`), starting from the roles in `process.md` plus an Administrator. Users are created by an administrator; no self sign-up. Success and failed logins are written to the audit log. Not built yet: lockout or rate limit after repeated failures, password reset, password change screen. |
+| Display time zone | A setting (`display_time_zone`, default Africa/Addis_Ababa), changes are audited. Display only; storage stays UTC. |
 | Calendar code | Two implementations (Go and TypeScript) tested against one shared `docs/calendar-vectors.json` built from an independent reference. Time zone is a setting, default Africa/Addis_Ababa. Display only; database stays UTC. |
 
 ## Business facts worth remembering (from Crown's weekly report)

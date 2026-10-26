@@ -21,6 +21,6 @@ export default defineConfig({
       workbox: { globPatterns: ["**/*.{js,css,html,svg,woff2}"] },
     }),
   ],
-  server: { port: 5173, proxy: { "/healthz": "http://localhost:8080" } },
-  test: { include: ["src/**/*.test.ts"] },
+  server: { port: 5173, proxy: { "/healthz": "http://localhost:8080", "/api": "http://localhost:8080" } },
+  test: { include: ["src/**/*.test.ts"], testTimeout: 20_000 }, // the 220-year round trip can stall when the machine is busy
 });

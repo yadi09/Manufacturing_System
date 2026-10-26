@@ -20,8 +20,39 @@ type AuditLog struct {
 	Reason   pgtype.Text        `json:"reason"`
 }
 
+type Role struct {
+	Key  string `json:"key"`
+	Name string `json:"name"`
+}
+
+type RolePermission struct {
+	RoleKey    string `json:"role_key"`
+	Permission string `json:"permission"`
+}
+
+type Session struct {
+	TokenHash []byte             `json:"token_hash"`
+	UserID    pgtype.UUID        `json:"user_id"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
+}
+
 type Setting struct {
 	Key       string             `json:"key"`
 	Value     []byte             `json:"value"`
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+type User struct {
+	ID           pgtype.UUID        `json:"id"`
+	Email        string             `json:"email"`
+	FullName     string             `json:"full_name"`
+	PasswordHash string             `json:"password_hash"`
+	Active       bool               `json:"active"`
+	CreatedAt    pgtype.Timestamptz `json:"created_at"`
+}
+
+type UserRole struct {
+	UserID  pgtype.UUID `json:"user_id"`
+	RoleKey string      `json:"role_key"`
 }

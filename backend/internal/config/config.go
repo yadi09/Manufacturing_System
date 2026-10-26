@@ -8,12 +8,15 @@ import (
 type Config struct {
 	DatabaseURL string
 	Addr        string
+	// SecureCookie marks the session cookie HTTPS-only; set COOKIE_SECURE=true in production.
+	SecureCookie bool
 }
 
 func Load() (Config, error) {
 	c := Config{
-		DatabaseURL: os.Getenv("DATABASE_URL"),
-		Addr:        os.Getenv("API_ADDR"),
+		DatabaseURL:  os.Getenv("DATABASE_URL"),
+		Addr:         os.Getenv("API_ADDR"),
+		SecureCookie: os.Getenv("COOKIE_SECURE") == "true",
 	}
 	if c.DatabaseURL == "" {
 		return c, fmt.Errorf("DATABASE_URL is required")

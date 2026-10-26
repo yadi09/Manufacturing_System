@@ -1,7 +1,7 @@
 -include .env
 export
 
-.PHONY: db-up db-down dev test lint migrate sqlc screenshots calendar-vectors
+.PHONY: db-up db-down dev test lint migrate sqlc screenshots calendar-vectors create-user
 
 db-up:
 	docker compose up -d --wait postgres
@@ -15,7 +15,7 @@ dev: db-up migrate
 	trap 'kill 0' EXIT; (cd backend && go run ./cmd/api) & (cd frontend && pnpm dev --host) & wait
 
 test: db-up
-	cd backend && go test ./...
+	cd backend && go test -p 1 ./...  # one package at a time: they share crown_test
 	cd frontend && pnpm test
 
 lint:
@@ -33,3 +33,7 @@ migrate:
 
 sqlc:
 	cd backend && sqlc generate
+
+# make create-user EMAIL=admin@crown.example NAME="Admin" ROLES=admin   (asks for the password)
+create-user:
+	cd backend && go run ./cmd/createuser -email "$(EMAIL)" -name "$(NAME)" -roles "$(ROLES)"

@@ -20,6 +20,53 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Health"
+  /api/auth/login:
+    post:
+      operationId: login
+      summary: Sign in with email and password; sets the session cookie
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Signed in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Wrong email or password (the same answer for both)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/auth/logout:
+    post:
+      operationId: logout
+      summary: End the session and clear the cookie
+      responses:
+        "204":
+          description: Signed out
+  /api/auth/me:
+    get:
+      operationId: getMe
+      summary: The signed-in user with roles and permissions
+      responses:
+        "200":
+          description: The current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Not signed in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
     Health:
@@ -32,3 +79,44 @@ components:
         database:
           type: string
           enum: [up, down]
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    Role:
+      type: object
+      required: [key, name]
+      properties:
+        key:
+          type: string
+        name:
+          type: string
+    User:
+      type: object
+      required: [id, email, full_name, roles, permissions]
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        full_name:
+          type: string
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/Role"
+        permissions:
+          type: array
+          items:
+            type: string
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          description: Stable code (for example invalid_credentials, unauthenticated, forbidden), translated by the frontend
