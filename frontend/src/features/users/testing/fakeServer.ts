@@ -6,6 +6,7 @@ import type { Colour, Material, MaterialInput, Product, ProductInput } from "../
 import { MATERIALS, PRODUCTS } from "../../masterdata/testing/masterFixtures";
 import type { NewRecipe, Recipe } from "../../masterdata/recipeApi";
 import { EGG_VERSIONS, JAR_VERSIONS, summaryOf } from "../../masterdata/testing/recipeFixtures";
+import { createSetupData, setupHandle, type SetupData } from "../../setup/testing/setupHandle";
 
 export const ROLES: RoleInfo[] = [
   ["admin", "Administrator", "አስተዳዳሪ", "Manages users, settings and master data.", "ተጠቃሚዎችን፣ ቅንብሮችን እና መሠረታዊ መረጃን ያስተዳድራል።", ["audit.read", "settings.manage", "users.manage"]],
@@ -65,6 +66,8 @@ export interface FakeOptions {
   /** Recipe versions by colour id. Defaults to the egg tray and jar cover fixtures. */
   recipes?: Record<string, Recipe[]>;
   me?: User | null;
+  /** Machines, moulds, shifts, reasons, stores, employees and settings. Defaults to Crown's. */
+  setup?: SetupData;
   /** Make a request type fail, for example { "GET /api/users": 500 }. */
   failing?: Record<string, number>;
 }
@@ -79,6 +82,7 @@ export function createFakeServer(options: FakeOptions = {}) {
   const products = (options.products ?? PRODUCTS).map((p) => ({ ...p, colours: p.colours.map((c) => ({ ...c })) }));
   const recipes: Record<string, Recipe[]> = options.recipes ?? { c1: EGG_VERSIONS.map((r) => ({ ...r })), c2: JAR_VERSIONS.map((r) => ({ ...r })) };
   let nextId = 100;
+  const setup = createSetupData(options.setup);
   const adminCount = () => users.filter((x) => x.active && x.roles.includes("admin")).length;
 
   const sameName = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
@@ -232,6 +236,8 @@ export function createFakeServer(options: FakeOptions = {}) {
       return { status: 201, body: {} };
     }
 
+    const setupReply = setupHandle(setup, { can: me?.permissions ?? [], products, users, nextId: () => nextId++ }, method, path, body);
+    if (setupReply) return setupReply;
     const recipe = recipeHandle(method, path, body);
     if (recipe) return recipe;
     const master = masterHandle(method, path, body);
@@ -262,7 +268,7 @@ export function createFakeServer(options: FakeOptions = {}) {
     return { status: 404, body: { error: "not_found" } };
   }
 
-  return { handle, calls, users, materials, products, recipes, currentPassword };
+  return { handle, calls, users, materials, products, recipes, setup, currentPassword };
 }
 
 /** A fetch() that answers from the fake server. */

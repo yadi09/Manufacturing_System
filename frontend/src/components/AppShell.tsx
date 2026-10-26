@@ -18,13 +18,21 @@ interface NavItem {
   groupKey?: string;
   /** Shown only to people whose roles grant this permission. No fake items: add one when its screen exists. */
   permission?: string;
+  /** Starts a new group without a heading. */
+  separate?: boolean;
 }
 
 const NAV: NavItem[] = [
   { to: "/products", labelKey: "nav.products", icon: "box", permission: "masterdata.read", groupKey: "nav.masterData" },
   { to: "/materials", labelKey: "nav.materials", icon: "layers", permission: "masterdata.read" },
-  { to: "/users", labelKey: "nav.users", icon: "users", permission: "users.manage" },
-  { to: "/account", labelKey: "nav.account", icon: "user" },
+  { to: "/machines", labelKey: "nav.machines", icon: "factory", permission: "masterdata.read" },
+  { to: "/shifts", labelKey: "nav.shifts", icon: "clock", permission: "masterdata.read" },
+  { to: "/employees", labelKey: "nav.employees", icon: "badge", permission: "masterdata.read" },
+  { to: "/reasons", labelKey: "nav.reasons", icon: "message", permission: "masterdata.read" },
+  { to: "/stores", labelKey: "nav.stores", icon: "store", permission: "masterdata.read" },
+  { to: "/users", labelKey: "nav.users", icon: "users", permission: "users.manage", groupKey: "nav.administration" },
+  { to: "/settings", labelKey: "nav.settings", icon: "sliders", permission: "settings.manage" },
+  { to: "/account", labelKey: "nav.account", icon: "user", separate: true },
 ];
 
 interface Props {
@@ -49,7 +57,7 @@ export function AppShell({ user, title, subtitle, breadcrumb, actions, children 
   const nav = (
     <nav aria-label={t("nav.main")} className="flex flex-col gap-1">
       {items.map((n, i) => (
-        <div key={n.to} className={`flex flex-col gap-1 ${!n.groupKey && i > 0 && items[i - 1].groupKey === undefined ? "" : ""}`}>
+        <div key={n.to} className={`flex flex-col gap-1 ${n.separate && i > 0 ? "mt-3" : ""}`}>
           {n.groupKey && (
             <span className={`px-3 text-xs font-semibold uppercase tracking-wider text-ink-muted ${i > 0 ? "mt-3" : ""}`} style={{ lineHeight: "16px" }}>
               {t(n.groupKey)}
