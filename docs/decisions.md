@@ -36,6 +36,7 @@ Handoff for any Claude Code session (desktop app, VS Code extension, terminal). 
 | Operators have no accounts | Decided 2026-10-19 (owner): operators do not sign in. The manager who leads production (shift production manager) enters the data on their behalf, and each entry records both who typed it and the operator it concerns. So email or phone sign-in for floor staff is not needed now; accounts are for managers, supervisors, store, sales, purchasing, finance, the owner and administrators. Later, when HR employment management is added, every employee gets an account so they can make requests themselves (for example applying for leave). Not now. The employee record will carry an optional link to an account so accounts can be attached to existing employees then, with their history intact. |
 | QC inspectors have accounts | Decided 2026-10-19 (owner): QC inspectors sign in and record their own results with full responsibility for the output they inspected; each QC record carries their name. The QC result is always the QC inspector's responsibility (confirmed again 2026-10-19), so a QC result is never entered under another person's name. Because operators have no accounts, the `operator` sign-in role was removed (migration `00006`); "operator" stays a profession on the employee record. HR later adds an "Employee, self-service" sign-in role. |
 | Account page | Approved and built 2026-10-19 (mockups: https://claude.ai/artifact/Gs1DeA5BnnwMc7198nLobP). Everyone who signs in has an Account page: their details (read-only), Display (language, and Ethiopian or Gregorian calendar, default Ethiopian) and Change password. A person who must change their password sees only a first sign-in screen until they do; changing it signs out their other devices. |
+| Language and calendar per person | Decided 2026-10-19 (owner): each person's language and calendar choice is saved on the server, per account, with the device value used as a fallback before sign-in. Built as one small PR at the start of milestone 2 (today they are kept only on the device). |
 | Calendar code | Two implementations (Go and TypeScript) tested against one shared `docs/calendar-vectors.json` built from an independent reference. Time zone is a setting, default Africa/Addis_Ababa. Display only; database stays UTC. |
 
 ## Business facts worth remembering (from Crown's weekly report)
@@ -51,18 +52,25 @@ The report is saved at `docs/source/Crown_Weekly_Report.xlsx` and is the source 
 
 ## Status
 
-- Planning documents: done and pushed to `main`.
-- Milestone 1 (Foundation): in progress on `feature/foundation`. Done: repo skeleton, Go API with `settings` and append-only `audit_log`, frontend shell with English/Amharic and PWA, Playwright screenshot script, shared calendar module (Go and TypeScript, tested against ICU vectors, with the shift-day rule). Also done: login and roles on the backend (sessions, lockout, user management API, PRs #2 and #3), the design system and login mockups (approved), and the React design system plus sign-in screen built from them (`feature/login-screen`). Next: a user-management screen (needs a mockup), then Milestone 2 master data mockups.
-- Durations for milestones have not been estimated; give them after milestone 1.
+- Planning documents: done and on `main`.
+- **Milestone 1 (Foundation): built, 2026-10-19.** It sits in PRs #1 to #8 (a stack, merged in order with normal merge commits) and is on `main` once those are merged. Built:
+  - Repo, Makefile, Docker PostgreSQL, Go API (chi, pgx, sqlc, goose), React app (Vite, Tailwind, TanStack Query, i18next, PWA), 118 Playwright screenshots at 360, 768 and 1280 px in English and Amharic.
+  - Shared Ethiopian and Gregorian calendar module in Go and TypeScript, tested against ICU, with the shift-day rule and a time zone setting.
+  - Email and password sign-in, sessions, lockout after repeated failures, 10 sign-in roles with permissions as data, and user management (list, add, edit, deactivate and reactivate, reset password), with every change in the append-only audit log. New and reset passwords must be changed at first sign-in, enforced by the API.
+  - Design system (approved), sign-in screen, app shell, users screens, Account page (details, language, calendar, change password) and the first sign-in screen.
+  - Against the plan's "done when": sign-in works, roles limit what people see (menu and API), calendar tests pass, changes are written to the audit log, and the design system and first screens are approved in both languages (Amharic is still a draft until a native speaker reviews it).
+- **Milestone 1 items not built yet** (open, see below): an audit log viewer, the administrator screen for settings, CI, deployment and backups, and per-person language and calendar (scheduled as the first small PR of milestone 2).
+- **Milestone 2 (Master data): next.** Order of work: (1) small PR: language and calendar saved per person; (2) data model proposal for approval (Opus); (3) mockups for products and BOM screens; (4) build.
+- Time estimates for milestones 2 to 7 are in `docs/implementation-plan.md` ("Time estimate"). What Crown must supply for master data: `docs/crown-data-checklist.md`.
 
 ## Still open
 
 - **Rest rotation to QC:** the owner confirmed the QC result is always the QC inspector's responsibility. My reading, to confirm with Crown before milestone 4: an operator who rotates to the QC area helps, but the result is recorded under a QC inspector's account, never under the shift production manager's.
-- **Needs native-speaker review (Amharic drafts):** the 11 role names and one-line descriptions (migration `00005_user_admin.sql`), the password dialog and result text, and every string of the users and sign-in screens (`frontend/src/i18n/locales/am.json`).
-- **Calendar and language choice are stored on the device** (browser), not per person on the server. Moving a person to another device means choosing again. Decide whether to store them per account before the pilot.
-
+- **Sign-in method for employees without email (operators), when HR gives everyone an account:** email, username or phone. Waiting for Crown. Not needed before the HR module.
+- **Needs native-speaker review (Amharic drafts):** the 10 role names and one-line descriptions (migration `00005_user_admin.sql`), the password dialog and result text, and every string of the users, sign-in and Account screens (`frontend/src/i18n/locales/am.json`), including the calendar month, weekday and date-format strings.
+- **Administrator screen for settings** (time zone, sign-in limits, rest interval and the others in `process.md`): settings exist in the database but have no screen. Plan: build it with the master data admin screens in milestone 2.
+- **Audit log viewer** for administrators and the owner: not built. Propose milestone 5 with the reports, or earlier if Crown wants to inspect changes during the pilot.
+- **CI, deployment and backups:** not set up. The screenshot script uses the installed Google Chrome; a CI server needs its own browser setup. Hosting server, HTTPS, daily off-server backup and a restore test must exist before the factory pilot.
 - Day shift report and egg tray report from Crown (not available yet).
 - Maximum regrind percentage, if Crown has one.
-- Real list of colors, machines and shift times, entered as data when known.
-- Amharic translation review by a native speaker before rollout, including the calendar month, weekday and date-format strings.
-- CI: not set up yet. The screenshot script uses the installed Google Chrome; a CI server needs its own browser setup.
+- Real list of colors, machines, cavities, cycle times and shift times, entered as data when known (see `docs/crown-data-checklist.md`).

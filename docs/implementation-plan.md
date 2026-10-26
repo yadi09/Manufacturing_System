@@ -95,7 +95,7 @@ Gross throughput is everything that passed through a machine, regrind included, 
 The production floor (milestone 4) is built before the sales chain, because that is where Crown loses the most visibility today. Until milestone 6, production orders are created by hand, which is also how Crown fills its finished goods store.
 
 1. **Foundation:** login and roles, audit log, settings, design system, English and Amharic text, Ethiopian calendar module, database, automated tests.
-2. **Master data:** products and colors, BOMs, machines, shifts, employees, damage reasons, stores.
+2. **Master data:** first a small PR that saves each person's language and calendar choice on the server (the device value stays as the fallback before sign-in); then products and colors, BOMs, machines, shifts, employees, damage reasons, stores, and the administrator screen for settings.
 3. **Inventory and purchasing:** lots, stock ledger, reservations, purchase orders, receiving, regrind store.
 4. **Production floor:** orders, plans, material requests, machine events, QC, staging, recycling, handover, offline entry.
 5. **Live board and reports:** floor board, owner dashboard, alerts, automatic weekly report.
@@ -114,7 +114,39 @@ From milestone 2 on, screens are mocked up and approved before they are built. E
 | 6. Sales and finance | An order of 100 with 90 delivered reconciles correctly, with the carried-over balance and a sample listed separately |
 | 7. People and rollout | A pilot week runs at the factory with real staff, rotation and attendance are recorded, and performance reports are correct |
 
-Durations are not estimated yet. They will be given after milestone 1, once we see how fast the foundation goes.
+## Time estimate
+
+Calendar weeks from now, written 2026-10-19 after milestone 1. Milestone 1 took one long working session of build time (code, tests and screenshots), with mockups approved and questions answered within hours. Real calendar time will be slower, because most of the elapsed time is reviews, approvals and waiting for Crown, not coding.
+
+| Milestone | Likely | Range | What drives the time |
+| --- | --- | --- | --- |
+| 2. Master data (includes the per-person language PR) | 2 weeks | 1.5 to 2.5 | About eight mostly simple screens, but each batch needs approved mockups and Crown's real data |
+| 3. Inventory and purchasing | 3.5 weeks | 3 to 4 | Stock ledger, reservations and the two-sales-at-once locking test; careful, test-heavy logic |
+| 4. Production floor | 6 weeks | 5 to 7 | The largest: events, plans from cycle time, QC, staging, recycling, handover, and offline entry that syncs later |
+| 5. Live board and reports | 3 weeks | 2.5 to 3.5 | Live updates, the owner dashboard (a showpiece screen), alerts, and reproducing the weekly report exactly |
+| 6. Sales and finance | 3.5 weeks | 3 to 4 | Receipt to order chain, paid versus delivered, samples, pay-later, reconciliation |
+| 7. People and rollout | 3 weeks, then pilot | 2.5 to 3.5 | Rosters, rotation, attendance, performance, then a pilot week and training at the factory |
+| Deployment, CI and backups (spread across the above) | 1.5 weeks | 1 to 2 | Server, HTTPS, daily off-server backup, restore test, automated checks |
+| Pilot week and training at Crown | 2 to 3 weeks | | Depends on Crown's people and schedule |
+
+**Build milestones 2 to 7: about 21 weeks (range 17 to 25). With deployment and the pilot, about 26 weeks, roughly six months (range 22 to 31).** If reviews are same-day and Crown's data arrives early, the build could approach 14 weeks; I would not plan on it.
+
+**Assumptions**
+- Work continues as in milestone 1: mockups approved before screens, tests written with each rule, English and Amharic from the first screen, small stacked PRs.
+- The owner reviews mockups and PRs within one to two working days and answers questions within a day.
+- Crown supplies the master data (see `docs/crown-data-checklist.md`) before each batch of screens, and a native Amharic speaker is available for review.
+- One person builds with Claude; no second developer. No new modules beyond this plan (HR comes after the pilot).
+- Hosting and deployment decisions (which server, which backup storage) are made when the plan reaches them.
+
+**Main risks**
+1. **Crown's data arriving late** (colours, cavities, cycle times, shift times, BOMs, the day shift and egg tray reports). Blocks milestones 2 and 4.
+2. **Offline entry on tablets** (milestone 4): syncing entries made during power cuts, without losing or doubling any. Mitigated by the idempotent event keys already in the design, and by tests that replay entries.
+3. **Reservation and allocation under concurrency** (milestone 3): two sales taking the last stock. Mitigated by row locking and a test that races them.
+4. **One person entering for all operators** (milestone 4): the shift production manager types every machine event. If the screen is slow, entries become late or missing. Mitigation: very few taps, large targets, tested on a real tablet with the real manager before the screen is final.
+5. **Review load:** stacked PRs pile up if they wait. Mitigation: merge each milestone's PRs as they finish.
+6. **Amharic quality:** every Amharic string is a draft until reviewed. A late review can mean rework of labels, not logic.
+7. **Deployment is not designed yet:** server, HTTPS and backups need decisions and a restore test before the pilot.
+8. **Scope creep:** HR, prices and accounting are out of scope; adding them moves every date.
 
 ## Screens and design approvals
 
