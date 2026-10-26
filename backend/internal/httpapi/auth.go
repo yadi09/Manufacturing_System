@@ -6,6 +6,7 @@ import (
 	"errors"
 	"mime"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/yadi09/Manufacturing_System/backend/internal/auth"
@@ -87,6 +88,12 @@ func (h *authHandlers) login(w http.ResponseWriter, r *http.Request) {
 	token, user, err := h.auth.Login(r.Context(), req.Email, req.Password)
 	if errors.Is(err, auth.ErrInvalidCredentials) {
 		writeError(w, http.StatusUnauthorized, "invalid_credentials")
+		return
+	}
+	var locked *auth.LockedError
+	if errors.As(err, &locked) {
+		w.Header().Set("Retry-After", strconv.Itoa(int(locked.RetryAfter.Seconds())+1))
+		writeError(w, http.StatusTooManyRequests, "too_many_attempts")
 		return
 	}
 	if err != nil {

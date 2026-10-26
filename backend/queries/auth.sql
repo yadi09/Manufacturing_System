@@ -27,3 +27,12 @@ WHERE ur.user_id = $1 ORDER BY r.key;
 SELECT DISTINCT rp.permission FROM user_roles ur
 JOIN role_permissions rp ON rp.role_key = ur.role_key
 WHERE ur.user_id = $1 ORDER BY rp.permission;
+
+-- name: RecentFailedLogins :many
+-- Failed logins for this email inside the window and after the last successful login, newest first.
+SELECT f.at FROM audit_log f
+WHERE f.entity = 'auth' AND f.action = 'login_failed' AND f.actor = @email::text
+  AND f.at > now() - make_interval(secs => @window_secs::int)
+  AND f.at > COALESCE((SELECT max(ok.at) FROM audit_log ok WHERE ok.entity = 'auth' AND ok.action = 'login' AND ok.actor = @email::text), '-infinity')
+ORDER BY f.at DESC
+LIMIT @max_rows::int;

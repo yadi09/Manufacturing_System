@@ -181,3 +181,39 @@ func (q *Queries) ListUserRoles(ctx context.Context, userID pgtype.UUID) ([]Role
 	}
 	return items, nil
 }
+
+const recentFailedLogins = `-- name: RecentFailedLogins :many
+SELECT f.at FROM audit_log f
+WHERE f.entity = 'auth' AND f.action = 'login_failed' AND f.actor = $1::text
+  AND f.at > now() - make_interval(secs => $2::int)
+  AND f.at > COALESCE((SELECT max(ok.at) FROM audit_log ok WHERE ok.entity = 'auth' AND ok.action = 'login' AND ok.actor = $1::text), '-infinity')
+ORDER BY f.at DESC
+LIMIT $3::int
+`
+
+type RecentFailedLoginsParams struct {
+	Email      string `json:"email"`
+	WindowSecs int32  `json:"window_secs"`
+	MaxRows    int32  `json:"max_rows"`
+}
+
+// Failed logins for this email inside the window and after the last successful login, newest first.
+func (q *Queries) RecentFailedLogins(ctx context.Context, arg RecentFailedLoginsParams) ([]pgtype.Timestamptz, error) {
+	rows, err := q.db.Query(ctx, recentFailedLogins, arg.Email, arg.WindowSecs, arg.MaxRows)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []pgtype.Timestamptz
+	for rows.Next() {
+		var at pgtype.Timestamptz
+		if err := rows.Scan(&at); err != nil {
+			return nil, err
+		}
+		items = append(items, at)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
