@@ -14,11 +14,15 @@ interface NavItem {
   to: string;
   labelKey: string;
   icon: IconName;
+  /** A small heading shown above the first item of a group. */
+  groupKey?: string;
   /** Shown only to people whose roles grant this permission. No fake items: add one when its screen exists. */
   permission?: string;
 }
 
 const NAV: NavItem[] = [
+  { to: "/products", labelKey: "nav.products", icon: "box", permission: "masterdata.read", groupKey: "nav.masterData" },
+  { to: "/materials", labelKey: "nav.materials", icon: "layers", permission: "masterdata.read" },
   { to: "/users", labelKey: "nav.users", icon: "users", permission: "users.manage" },
   { to: "/account", labelKey: "nav.account", icon: "user" },
 ];
@@ -27,12 +31,14 @@ interface Props {
   user: User;
   title: string;
   subtitle?: string;
+  /** Where this page sits, shown above the title (for example Products / Egg tray). */
+  breadcrumb?: ReactNode;
   actions?: ReactNode;
   children: ReactNode;
 }
 
 /** Sidebar on desktop (1024px and up); top bar with a menu below that. */
-export function AppShell({ user, title, subtitle, actions, children }: Props) {
+export function AppShell({ user, title, subtitle, breadcrumb, actions, children }: Props) {
   const { t, i18n } = useTranslation();
   const wide = useMediaQuery("(min-width: 1024px)");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -42,9 +48,14 @@ export function AppShell({ user, title, subtitle, actions, children }: Props) {
 
   const nav = (
     <nav aria-label={t("nav.main")} className="flex flex-col gap-1">
-      {items.map((n) => (
+      {items.map((n, i) => (
+        <div key={n.to} className={`flex flex-col gap-1 ${!n.groupKey && i > 0 && items[i - 1].groupKey === undefined ? "" : ""}`}>
+          {n.groupKey && (
+            <span className={`px-3 text-xs font-semibold uppercase tracking-wider text-ink-muted ${i > 0 ? "mt-3" : ""}`} style={{ lineHeight: "16px" }}>
+              {t(n.groupKey)}
+            </span>
+          )}
         <NavLink
-          key={n.to}
           to={n.to}
           onClick={() => setMenuOpen(false)}
           className="flex h-control-md items-center gap-3 rounded-md px-3 text-base font-medium text-ink hover:bg-surface-100 aria-[current=page]:bg-brand-tint aria-[current=page]:font-semibold aria-[current=page]:text-brand"
@@ -52,6 +63,7 @@ export function AppShell({ user, title, subtitle, actions, children }: Props) {
           <Icon name={n.icon} />
           {t(n.labelKey)}
         </NavLink>
+        </div>
       ))}
     </nav>
   );
@@ -78,6 +90,7 @@ export function AppShell({ user, title, subtitle, actions, children }: Props) {
   const header = (
     <header className="flex flex-wrap items-end justify-between gap-4">
       <div className="flex flex-col gap-1">
+        {breadcrumb}
         <h1 className="text-[28px] font-semibold leading-9 am:leading-10">{title}</h1>
         {subtitle && <p className="text-sm text-ink-muted">{subtitle}</p>}
       </div>
@@ -131,6 +144,7 @@ export function AppShell({ user, title, subtitle, actions, children }: Props) {
       <main className="flex flex-1 flex-col gap-4 px-4 pb-6 pt-5 md:gap-6 md:px-8 md:py-8">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div className="flex flex-col gap-1">
+            {breadcrumb}
             <h1 className="text-[28px] font-semibold leading-9 am:leading-10">{title}</h1>
             {subtitle && <p className="text-sm text-ink-muted">{subtitle}</p>}
           </div>
