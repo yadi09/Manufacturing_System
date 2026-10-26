@@ -128,7 +128,7 @@ Before each milestone's screens are built, mockups are produced as pictures that
 | Plan board with edits and reasons; waiting orders; weekly roster | Production manager | PC or tablet | 4, 7 |
 | Daily material request; shift handover report; rest rotation prompts and assignments | Shift production manager | Tablet | 4, 7 |
 | Machine entry (material loaded, on, output, off, downtime reason, naming the operator it is about) | Shift production manager, on behalf of operators (who have no accounts) | Tablet or phone | 4 |
-| QC entry (finished and damaged kg with reasons) | QC inspectors, or the shift production manager if QC staff also have no accounts (open question) | Tablet or phone | 4 |
+| QC entry (finished and damaged kg with reasons) | QC inspectors, signed in with their own accounts and responsible for what they inspect | Tablet or phone | 4 |
 | Purchase orders: edit (including expected arrival per line), approve, receive; purchasing view with expected arrivals | Purchaser | PC | 3 |
 | Owner dashboard, live board, reports | Owner or GM | Any device | 5 |
 | Reconciliation, receivables, weekly and monthly production reports | Finance | PC | 6 |

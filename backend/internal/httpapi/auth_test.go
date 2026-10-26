@@ -207,7 +207,7 @@ func TestPermissions_FollowRoles(t *testing.T) {
 
 func TestMultipleRolesCombine(t *testing.T) {
 	e := setup(t)
-	e.mustUser(t, "x@crown.example", "operator", "qc_inspector", "owner")
+	e.mustUser(t, "x@crown.example", "purchaser", "qc_inspector", "owner")
 	_, u, err := e.svc.Login(context.Background(), "x@crown.example", pw)
 	if err != nil {
 		t.Fatal(err)

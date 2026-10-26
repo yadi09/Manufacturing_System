@@ -48,7 +48,7 @@ func TestUsersAPI_CreateListAndAudit(t *testing.T) {
 	e := setup(t)
 	admin, _ := signIn(t, e, "admin@crown.example", "admin")
 
-	rec := e.do("POST", "/api/users", `{"email":"New@Crown.example","full_name":"New Person","password":"`+pw+`","roles":["operator","qc_inspector"]}`, admin)
+	rec := e.do("POST", "/api/users", `{"email":"New@Crown.example","full_name":"New Person","password":"`+pw+`","roles":["purchaser","qc_inspector"]}`, admin)
 	if rec.Code != 201 {
 		t.Fatalf("create = %d %s", rec.Code, rec.Body)
 	}
@@ -74,19 +74,19 @@ func TestUsersAPI_CreateListAndAudit(t *testing.T) {
 func TestUsersAPI_UpdateRolesAndDeactivate(t *testing.T) {
 	e := setup(t)
 	admin, _ := signIn(t, e, "admin@crown.example", "admin")
-	worker, workerID := signIn(t, e, "w@crown.example", "operator")
+	worker, workerID := signIn(t, e, "w@crown.example", "purchaser")
 
 	patch := e.do("PATCH", "/api/users/"+workerID, `{"roles":["qc_inspector","owner"],"full_name":"Renamed"}`, admin)
 	if patch.Code != 204 {
 		t.Fatalf("patch = %d %s", patch.Code, patch.Body)
 	}
 	me := e.do("GET", "/api/auth/me", "", worker)
-	if !strings.Contains(me.Body.String(), `"key":"owner"`) || strings.Contains(me.Body.String(), `"key":"operator"`) || !strings.Contains(me.Body.String(), "Renamed") {
+	if !strings.Contains(me.Body.String(), `"key":"owner"`) || strings.Contains(me.Body.String(), `"key":"purchaser"`) || !strings.Contains(me.Body.String(), "Renamed") {
 		t.Fatalf("roles not applied: %s", me.Body)
 	}
 	var oldV, newV string
 	err := e.pool.QueryRow(context.Background(), `SELECT old_value::text, new_value::text FROM audit_log WHERE action = 'roles_change' AND entity = 'users'`).Scan(&oldV, &newV)
-	if err != nil || !strings.Contains(oldV, "operator") || !strings.Contains(newV, "owner") {
+	if err != nil || !strings.Contains(oldV, "purchaser") || !strings.Contains(newV, "owner") {
 		t.Fatalf("audit old/new = %s | %s | %v", oldV, newV, err)
 	}
 
@@ -131,7 +131,7 @@ func TestUsersAPI_LastAdminIsProtected(t *testing.T) {
 func TestPasswords_AdminResetEndsSessions(t *testing.T) {
 	e := setup(t)
 	admin, _ := signIn(t, e, "admin@crown.example", "admin")
-	worker, workerID := signIn(t, e, "w@crown.example", "operator")
+	worker, workerID := signIn(t, e, "w@crown.example", "purchaser")
 
 	if rec := e.do("POST", "/api/users/"+workerID+"/password", `{"password":"short"}`, admin); rec.Code != 422 {
 		t.Fatalf("weak = %d", rec.Code)
@@ -159,7 +159,7 @@ func TestPasswords_AdminResetEndsSessions(t *testing.T) {
 
 func TestPasswords_ChangeOwn(t *testing.T) {
 	e := setup(t)
-	c1, _ := signIn(t, e, "w@crown.example", "operator")
+	c1, _ := signIn(t, e, "w@crown.example", "purchaser")
 	c2 := sessionOf(t, login(e, "w@crown.example", pw)) // a second device
 
 	if rec := e.do("POST", "/api/auth/password", `{"current_password":"wrong wrong wrong","new_password":"another good one"}`, c1); rec.Code != 403 {
