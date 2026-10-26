@@ -3,14 +3,8 @@
     "name": "Crown Manufacturing",
     "tagline": "Production management"
   },
-  "foundation": {
-    "title": "Foundation check",
-    "description": "Setup page. Real screens are built after mockups are approved.",
-    "apiStatus": "API status",
-    "language": "Language",
-    "statusOffline": "offline"
-  },
   "language": {
+    "label": "Language",
     "en": "English",
     "am": "አማርኛ"
   },
@@ -57,5 +51,50 @@
       "ethiopian": "{{weekday}}, {{month}} {{day}}, {{year}}",
       "gregorian": "{{weekday}}, {{month}} {{day}}, {{year}}"
     }
+  },
+  "login": {
+    "title": "Sign in",
+    "subtitle": "Use the email and password your administrator gave you.",
+    "email": "Email",
+    "password": "Password",
+    "show": "Show",
+    "hide": "Hide",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "submit": "Sign in",
+    "busy": "Signing in…",
+    "help": "Forgot your password? Ask your system administrator to reset it.",
+    "fieldError": "Check the email and password, then try again.",
+    "invalid": {
+      "title": "Email or password is wrong.",
+      "body": "Check both and try again. After 5 wrong tries, sign-in pauses for 15 minutes."
+    },
+    "locked": {
+      "title": "Sign-in is paused for this email.",
+      "body_one": "Too many wrong tries. Try again in {{count}} minute, or ask your administrator.",
+      "body_other": "Too many wrong tries. Try again in {{count}} minutes, or ask your administrator."
+    },
+    "offline": {
+      "title": "No connection to the server.",
+      "body": "Check the network, then try again. Nothing you typed is lost."
+    },
+    "other": {
+      "title": "Something went wrong.",
+      "body": "Try again in a moment. If it keeps happening, tell your administrator."
+    },
+    "productLine": "Production system",
+    "statement": "The whole factory, live.",
+    "statementShort": "Orders, machines, stock and shifts in one place.",
+    "statementLong": "Orders, machines, stock and shifts in one place, from the receipt to the finished goods store.",
+    "products": "Egg trays · Jar covers"
+  },
+  "account": {
+    "signedInAs": "Signed in as {{name}}",
+    "roles": "Roles",
+    "signOut": "Sign out",
+    "signingOut": "Signing out…",
+    "placeholder": "Temporary page. Real screens are built after their mockups are approved.",
+    "loading": "Loading…",
+    "loadError": "Could not reach the server."
   }
 }

@@ -1,10 +1,55 @@
 @import "tailwindcss";
 
+/* Crown design system tokens. Values match the approved design system (README rules apply). */
 @theme {
-  --font-sans: "Inter Variable", "Noto Sans Ethiopic", system-ui, sans-serif;
-  --color-brand: #0f766e;
+  --font-sans: "IBM Plex Sans", "Noto Sans Ethiopic", system-ui, sans-serif;
+
+  --color-surface-0: #ffffff;
+  --color-surface-50: #f4f7f6;
+  --color-surface-100: #e8eeec;
+  --color-line: #d5dfdc;
+  --color-control-border: #768985;
+  --color-ink: #13201e;
+  --color-ink-muted: #4a5a57;
+  --color-brand: #0b5f66;
+  --color-brand-strong: #08474d;
+  --color-brand-deep: #05343a;
+  --color-brand-tint: #e2f0ef;
+  --color-on-brand: #ffffff;
+  --color-on-brand-muted: #a9d3d0;
+  --color-status-running: #3cbf74;
+  --color-status-idle: #f0b43c;
+  --color-status-down: #951d1a;
+  --color-danger: #b42318;
+  --color-danger-tint: #fcebe9;
+  --color-warning-tint: #fdf2dc;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  --shadow-card: 0 1px 2px rgb(19 32 30 / 0.06), 0 2px 8px rgb(19 32 30 / 0.05);
+  --shadow-raised: 0 4px 12px rgb(19 32 30 / 0.08), 0 16px 40px rgb(19 32 30 / 0.1);
+
+  --spacing-control-md: 48px;
+  --spacing-control-floor: 64px;
 }
 
 body {
-  @apply bg-white text-slate-900 antialiased;
+  @apply bg-surface-50 font-sans text-ink antialiased;
+  font-size: 16px;
+  line-height: 24px;
 }
+
+/* One focus ring everywhere: 2px brand with a 2px gap (3:1 or better on every surface). */
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Amharic needs taller lines than Latin text at the same size. */
+@custom-variant am (&:where(:lang(am), :lang(am) *));

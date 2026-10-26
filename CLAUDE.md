@@ -27,6 +27,8 @@ Commands (run from the repo root). First time: `cp .env.example .env` and `cd fr
 - `make create-user EMAIL=... NAME="..." ROLES=admin`: create a user (asks for the password, hidden; there is no sign-up page). Role keys are in migration `00003_auth.sql`; run `make migrate` first
 - `make calendar-vectors`: regenerate `docs/calendar-vectors.json` from ICU (Node's Intl). Never generate it from our own calendar code.
 
+Frontend: colours, type and radii come from the approved design system; tokens are in `frontend/src/index.css` (`@theme`) and shared components in `frontend/src/components/`. Use them, do not restyle per screen. The sign-in page (`frontend/src/features/auth/`) is the reference for a built screen: translations in both languages, tests for each state, screenshots at 360/768/1280 px in both languages.
+
 Calendar: `backend/internal/calendar` (Go) and `frontend/src/lib/calendar` (TypeScript) must stay in step; both test against `docs/calendar-vectors.json`. Display only; the time zone is a setting, default Africa/Addis_Ababa. Month and weekday names live in the translation files.
 
 ## Rules that must hold everywhere
