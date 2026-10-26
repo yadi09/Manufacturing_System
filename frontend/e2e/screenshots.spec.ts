@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { createFakeServer, type FakeOptions } from "../src/features/users/testing/fakeServer";
+import { ADMIN_ME, createFakeServer, type FakeOptions } from "../src/features/users/testing/fakeServer";
 
 // Captures every page at the three checked sizes in both languages into
 // frontend/screenshots/<page>-<lang>-<width>.png. Add new pages to PAGES.
@@ -28,6 +28,15 @@ async function signedInAdmin(page: Page, options: FakeOptions = {}, hold: string
     const reply = server.handle(req.method(), path, req.postData() ? JSON.parse(req.postData()!) : undefined);
     await route.fulfill({ status: reply.status, contentType: "application/json", headers: reply.headers, body: reply.body === undefined ? undefined : JSON.stringify(reply.body) });
   });
+}
+
+const ADMIN_MUST_CHANGE = { ...ADMIN_ME, must_change_password: true };
+
+async function fillPasswords(page: Page, current: string, next: string, repeat: string) {
+  await page.getByLabel(label("Current password", "የአሁኑ የይለፍ ቃል")).fill(current);
+  await page.getByLabel(label("New password", "አዲስ የይለፍ ቃል")).fill(next);
+  await page.getByLabel(label("Repeat the new password", "አዲሱን የይለፍ ቃል ይድገሙ")).fill(repeat);
+  await page.locator("form button[type=submit]").click();
 }
 
 /** A regular expression matching the English or the Amharic label. */
@@ -156,6 +165,36 @@ const PAGES: Case[] = [
   { name: "users-empty", path: "/users", prepare: (p) => signedInAdmin(p, { users: [] }), act: (p) => p.getByRole("heading", { level: 2 }).waitFor() },
   { name: "users-loading", path: "/users", prepare: (p) => signedInAdmin(p, {}, ["GET /api/users"]), act: (p) => p.getByRole("status").waitFor() },
   { name: "users-error", path: "/users", prepare: (p) => signedInAdmin(p, { failing: { "GET /api/users": 500 } }), act: (p) => p.getByRole("alert").waitFor() },
+  // The Account page and the first sign-in screen.
+  { name: "account", path: "/account", prepare: (p) => signedInAdmin(p), act: (p) => p.getByRole("heading", { level: 2 }).first().waitFor() },
+  {
+    name: "account-wrong-password",
+    path: "/account",
+    prepare: (p) => signedInAdmin(p),
+    act: async (p) => {
+      await fillPasswords(p, "not my password", "a brand new password", "a brand new password");
+      await p.locator("[aria-invalid=true]").first().waitFor();
+    },
+  },
+  {
+    name: "account-changed",
+    path: "/account",
+    prepare: (p) => signedInAdmin(p),
+    act: async (p) => {
+      await fillPasswords(p, "current-password-1", "a brand new password", "a brand new password");
+      await p.getByRole("status").waitFor();
+    },
+  },
+  { name: "first-sign-in", path: "/", prepare: (p) => signedInAdmin(p, { me: ADMIN_MUST_CHANGE }), act: (p) => p.getByRole("heading", { level: 2 }).first().waitFor() },
+  {
+    name: "first-sign-in-mismatch",
+    path: "/",
+    prepare: (p) => signedInAdmin(p, { me: ADMIN_MUST_CHANGE }),
+    act: async (p) => {
+      await fillPasswords(p, "current-password-1", "a brand new password", "a different password");
+      await p.locator("[aria-invalid=true]").first().waitFor();
+    },
+  },
   {
     name: "users-menu",
     path: "/users",
@@ -174,7 +213,7 @@ for (const c of PAGES) {
     for (const width of c.widths ?? WIDTHS) {
       test(`${c.name} ${lang} ${width}px`, async ({ browser }) => {
         // A tall window, so overlays (panels, dialogs) cover the whole page like they do for a person scrolling.
-        const height = c.name.startsWith("users") ? 1100 : 800;
+        const height = /^(users|account|first-sign-in)/.test(c.name) ? 1100 : 800;
         const context = await browser.newContext({ viewport: { width, height } });
         await context.addInitScript((l) => localStorage.setItem("lang", l), lang);
         const page = await context.newPage();
@@ -186,7 +225,17 @@ for (const c of PAGES) {
 
         // Quality gate: nothing may scroll sideways.
         const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-        expect(overflow, "horizontal overflow in px").toBeLessThanOrEqual(0);
+        // When it fails, name the elements that stick out, so the fix is quick.
+        const culprits =
+          overflow > 0
+            ? await page.evaluate(() =>
+                Array.from(document.querySelectorAll("body *"))
+                  .filter((el) => el.getBoundingClientRect().right > window.innerWidth + 0.5 && getComputedStyle(el).position !== "fixed")
+                  .slice(0, 5)
+                  .map((el) => `<${el.tagName.toLowerCase()} class="${String(el.getAttribute("class")).slice(0, 80)}"> right=${Math.round(el.getBoundingClientRect().right)}`),
+              )
+            : [];
+        expect(overflow, `horizontal overflow in px; sticking out: ${culprits.join(" | ")}`).toBeLessThanOrEqual(0);
 
         await page.screenshot({ path: `screenshots/${c.name}-${lang}-${width}.png`, fullPage: true });
         await context.close();

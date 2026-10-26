@@ -18,7 +18,10 @@ interface NavItem {
   permission?: string;
 }
 
-const NAV: NavItem[] = [{ to: "/users", labelKey: "nav.users", icon: "users", permission: "users.manage" }];
+const NAV: NavItem[] = [
+  { to: "/users", labelKey: "nav.users", icon: "users", permission: "users.manage" },
+  { to: "/account", labelKey: "nav.account", icon: "user" },
+];
 
 interface Props {
   user: User;
