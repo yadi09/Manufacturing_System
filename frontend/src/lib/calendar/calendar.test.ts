@@ -106,3 +106,16 @@ describe("names come from translation files", () => {
     expect(formatDate(i.t, at)).toBe("ዓርብ፣ መስከረም 1 ቀን 2019 ዓ.ም.");
   });
 });
+
+describe("short dates", () => {
+  it("shows the date without the weekday, in both calendars and languages", async () => {
+    const { formatShortDate } = await import("./format");
+    const i = i18n.createInstance();
+    await i.init({ resources: { en: { translation: en }, am: { translation: am } }, lng: "en", interpolation: { escapeValue: false } });
+    const at = new Date("2026-10-12T08:00:00Z"); // Tikimt 2, 2019
+    expect(formatShortDate(i.t, at)).toBe("Tikimt 2, 2019");
+    expect(formatShortDate(i.t, at, "gregorian")).toBe("October 12, 2026");
+    await i.changeLanguage("am");
+    expect(formatShortDate(i.t, at)).toBe("ጥቅምት 2 ቀን 2019 ዓ.ም.");
+  });
+});

@@ -252,6 +252,42 @@ const PAGES: Case[] = [
     },
   },
   { name: "materials-error", path: "/materials", prepare: (p) => signedInAdmin(p, { failing: { "GET /api/materials": 500 } }), act: (p) => p.getByRole("alert").waitFor() },
+  // Recipes.
+  { name: "recipe-view", path: "/colours/c1/recipe", prepare: (p) => signedInAdmin(p), act: (p) => p.getByText("LLDPE M500026").first().waitFor() },
+  { name: "recipe-view-no-regrind", path: "/colours/c2/recipe", prepare: (p) => signedInAdmin(p), act: (p) => p.getByText("LLDPE M500026").first().waitFor() },
+  { name: "recipe-empty", path: "/colours/c3/recipe", prepare: (p) => signedInAdmin(p), act: (p) => p.getByRole("button", { name: label("Start with an empty recipe", "በባዶ ቅመማ ቅመም ጀምር") }).waitFor() },
+  {
+    name: "recipe-edit",
+    path: "/colours/c1/recipe?mode=edit",
+    prepare: (p) => signedInAdmin(p),
+    act: (p) => p.getByRole("button", { name: label("Save as version 4", "እንደ ስሪት 4 አስቀምጥ") }).waitFor(),
+  },
+  {
+    name: "recipe-edit-errors",
+    path: "/colours/c1/recipe?mode=edit",
+    prepare: (p) => signedInAdmin(p),
+    act: async (p) => {
+      await p.getByRole("button", { name: label("Remove LLDPE M500026", "LLDPE M500026ን አስወግድ") }).click();
+      await p.getByRole("button", { name: label("Remove Grey masterbatch", "ግራጫ ማስተርባችን አስወግድ") }).click();
+      await p.getByRole("button", { name: label("Save as version 4", "እንደ ስሪት 4 አስቀምጥ") }).click();
+      await p.getByText(label("Add at least one ingredient.", "ቢያንስ አንድ ንጥረ ነገር ጨምሩ።")).first().waitFor();
+    },
+  },
+  {
+    name: "recipe-history",
+    path: "/colours/c1/recipe?mode=history",
+    prepare: (p) => signedInAdmin(p),
+    act: (p) => p.getByText("Masterbatch amount corrected after a weighing test.").waitFor(),
+  },
+  {
+    name: "recipe-version",
+    path: "/colours/c1/recipe?mode=history",
+    prepare: (p) => signedInAdmin(p),
+    act: async (p) => {
+      await p.getByRole("button", { name: label("View version 1", "ስሪት 1 ይመልከቱ") }).click();
+      await p.getByRole("dialog").getByText("LLDPE M500026").waitFor();
+    },
+  },
   {
     name: "users-menu",
     path: "/users",
@@ -270,7 +306,7 @@ for (const c of PAGES) {
     for (const width of c.widths ?? WIDTHS) {
       test(`${c.name} ${lang} ${width}px`, async ({ browser }) => {
         // A tall window, so overlays (panels, dialogs) cover the whole page like they do for a person scrolling.
-        const height = /^(users|account|first-sign-in|products|product|colour|materials)/.test(c.name) ? 1100 : 800;
+        const height = /^(users|account|first-sign-in|products|product|colour|materials|recipe)/.test(c.name) ? 1100 : 800;
         const context = await browser.newContext({ viewport: { width, height } });
         await context.addInitScript((l) => localStorage.setItem("lang", l), lang);
         const page = await context.newPage();
