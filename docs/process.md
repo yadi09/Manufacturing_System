@@ -47,6 +47,8 @@ Crown makes two products on two machines, plus a recycling workspace. Each is co
 | Staging area | Inspected finished goods waiting for approval | Not stock; stock manager approves entry |
 | Finished goods store | Approved finished goods | Available vs. reserved shown separately |
 
+The five locations are fixed: they can be renamed but not added or removed, because the stock rules depend on each one.
+
 **Stock states.** Every item is *available*, *reserved* (promised to an order, still in the store) or *issued* (physically released). Sales only sees available stock.
 
 ## Roles and permissions
@@ -65,7 +67,7 @@ Each person has one or more roles; roles control what they can see and approve. 
 | Purchaser | Edits and approves purchase orders; records receiving |
 | Finance (report user) | Reads daily, weekly and monthly production and reconciliation reports |
 | Owner / GM | Reads the live board, dashboards and all reports |
-| Administrator | Creates and manages user accounts and roles, and defines materials, products, colours and recipes (BOMs); later also settings, shifts and damage reasons |
+| Administrator | Creates and manages user accounts and roles; defines materials, products, colours and recipes (BOMs), machines and areas, moulds and their standard cycle times, shifts, damage and downtime reasons, professions and employees; renames the five stores; changes settings |
 
 **Sample approval** is a separate permission. The cashier creates sample requests and the store manager approves them as delivered when releasing the sample. Both are configurable.
 
@@ -177,7 +179,7 @@ Finance's paid quantity and the store's delivered quantity are tracked as separa
 The system records who works when and where, so performance can be measured per person, workspace and shift.
 
 - **Employee record:** name, profession (operator, QC inspector, supervisor and others), and, for people who sign in, a link to their account. Operators have no account for now.
-- **Shift pattern:** two or three shifts (a setting), each with its own start and end time, with weekly rotation (for example day one week, night the next). Rotation rules are configurable per employee or team.
+- **Shift pattern:** two or three shifts (a setting), each with its own start and end time, with weekly rotation (for example day one week, night the next). Rotation rules are configurable per employee or team. Changing a shift's start or end time needs a reason and is written to the audit log; records already made keep the shift they belong to.
 - **Weekly roster:** the production manager sets the team for each shift. The system can propose the next week from the rotation rule.
 - **Workspace assignment:** the supervisor records where each person starts and every move afterward (machine 1, machine 2, QC, recycling), each with a time.
 - **Rest rotation:** after the configured time on a machine (currently 1 hour), the system suggests who should move to QC. The employee tells the supervisor, who confirms or changes the assignment in the system.

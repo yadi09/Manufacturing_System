@@ -418,6 +418,369 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Recipe"
+  /api/workspaces:
+    get:
+      operationId: listWorkspaces
+      summary: Machines and areas, each with the moulds on it (needs masterdata.read)
+      responses:
+        "200":
+          description: Workspaces
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Workspace"
+    post:
+      operationId: createWorkspace
+      summary: Add one (needs masterdata.manage)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkspaceInput"
+      responses:
+        "201":
+          description: Created
+        "409":
+          description: duplicate_name
+        "422":
+          description: invalid_input
+  /api/workspaces/{id}:
+    patch:
+      operationId: updateWorkspace
+      summary: Rename, change kind or 24-hour running, or retire (needs masterdata.manage)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkspaceInput"
+      responses:
+        "200":
+          description: Updated
+  /api/workspaces/{id}/moulds/{mould}:
+    put:
+      operationId: setMould
+      summary: Put a mould on a machine or change it (standard cycle time, cycle times per colour); active false takes it off (needs masterdata.manage)
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+        - { name: mould, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetupInput"
+      responses:
+        "200":
+          description: The machine with its moulds
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workspace"
+        "422":
+          description: not_a_machine, invalid_cycle_time, unknown_colour
+  /api/moulds:
+    get:
+      operationId: listMoulds
+      summary: Moulds, each making one product (needs masterdata.read)
+      responses:
+        "200":
+          description: Moulds
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Mould"
+    post:
+      operationId: createMould
+      summary: Add one (needs masterdata.manage)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MouldInput"
+      responses:
+        "201":
+          description: Created
+        "409":
+          description: duplicate_name
+        "422":
+          description: invalid_input, invalid_cavities, unknown_product
+  /api/moulds/{id}:
+    patch:
+      operationId: updateMould
+      summary: Rename, change cavities, or retire; the product never changes (needs masterdata.manage)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MouldInput"
+      responses:
+        "200":
+          description: Updated
+  /api/shifts:
+    get:
+      operationId: listShifts
+      summary: Shift definitions in local time (needs masterdata.read)
+      responses:
+        "200":
+          description: Shifts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Shift"
+    post:
+      operationId: createShift
+      summary: Add one (needs masterdata.manage)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShiftInput"
+      responses:
+        "201":
+          description: Created
+        "409":
+          description: duplicate_name
+        "422":
+          description: invalid_input, invalid_time
+  /api/shifts/{id}:
+    patch:
+      operationId: updateShift
+      summary: Change a shift; new start or end times need a reason (reason_required), written to the audit log (needs masterdata.manage)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShiftInput"
+      responses:
+        "200":
+          description: Updated
+  /api/reasons:
+    get:
+      operationId: listReasons
+      summary: Damage and downtime reasons (needs masterdata.read)
+      responses:
+        "200":
+          description: Reasons
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Reason"
+    post:
+      operationId: createReason
+      summary: Add one (needs masterdata.manage)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReasonInput"
+      responses:
+        "201":
+          description: Created
+        "409":
+          description: duplicate_name
+        "422":
+          description: invalid_input
+  /api/reasons/{id}:
+    patch:
+      operationId: updateReason
+      summary: Rename or retire; the kind never changes (needs masterdata.manage)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReasonInput"
+      responses:
+        "200":
+          description: Updated
+  /api/locations:
+    get:
+      operationId: listLocations
+      summary: The five fixed stock places (needs masterdata.read)
+      responses:
+        "200":
+          description: Locations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Location"
+  /api/locations/{key}:
+    patch:
+      operationId: renameLocation
+      summary: Rename a place; places cannot be added or removed (needs masterdata.manage)
+      parameters:
+        - { name: key, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LocationInput"
+      responses:
+        "200":
+          description: Renamed
+  /api/professions:
+    get:
+      operationId: listProfessions
+      summary: Job titles, with how many active employees hold each (needs masterdata.read)
+      responses:
+        "200":
+          description: Professions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Profession"
+    post:
+      operationId: createProfession
+      summary: Add one (needs masterdata.manage)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfessionInput"
+      responses:
+        "201":
+          description: Created
+        "409":
+          description: duplicate_name
+        "422":
+          description: invalid_input
+  /api/professions/{id}:
+    patch:
+      operationId: updateProfession
+      summary: Rename or retire (needs masterdata.manage)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfessionInput"
+      responses:
+        "200":
+          description: Updated
+  /api/employees:
+    get:
+      operationId: listEmployees
+      summary: Everyone who works at Crown; operators have no account (needs masterdata.read)
+      responses:
+        "200":
+          description: Employees
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Employee"
+    post:
+      operationId: createEmployee
+      summary: Add one (needs masterdata.manage)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmployeeInput"
+      responses:
+        "201":
+          description: Created
+        "409":
+          description: duplicate_name, account_linked
+        "422":
+          description: invalid_input, unknown_profession, unknown_user
+  /api/employees/{id}:
+    patch:
+      operationId: updateEmployee
+      summary: Change or retire an employee; user_id null removes the account link (needs masterdata.manage)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmployeeInput"
+      responses:
+        "200":
+          description: Updated
+  /api/settings:
+    get:
+      operationId: getSettings
+      summary: The settings the settings screen edits, with current values (needs settings.manage)
+      responses:
+        "200":
+          description: Key to value
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Settings"
+    patch:
+      operationId: updateSettings
+      summary: Change several settings at once, all or none; each change is audited (needs settings.manage)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Settings"
+      responses:
+        "200":
+          description: All settings after the change
+        "422":
+          description: "{error, key}: unknown_setting, invalid_value, invalid_time_zone, out_of_range, tolerance_order"
 components:
   schemas:
     Health:
@@ -679,3 +1042,145 @@ components:
               max_blend_pct: { type: string, nullable: true }
         warn_pct: { type: string, nullable: true }
         crit_pct: { type: string, nullable: true }
+    Workspace:
+      type: object
+      properties:
+        id: { type: string }
+        kind: { type: string, enum: [machine, qc, recycling] }
+        name: { type: string }
+        name_am: { type: string }
+        runs_24h: { type: boolean }
+        active: { type: boolean }
+        setups: { type: array, items: { $ref: "#/components/schemas/Setup" } }
+    WorkspaceInput:
+      type: object
+      properties:
+        kind: { type: string, enum: [machine, qc, recycling] }
+        name: { type: string }
+        name_am: { type: string }
+        runs_24h: { type: boolean }
+        active: { type: boolean }
+    Setup:
+      type: object
+      properties:
+        mould_id: { type: string }
+        standard_cycle_s: { type: string, nullable: true, description: Seconds; only the starting value of each day's plan. null while not known }
+        active: { type: boolean, description: false once the mould is taken off the machine }
+        colours: { type: array, items: { $ref: "#/components/schemas/SetupColour" } }
+    SetupColour:
+      type: object
+      properties:
+        colour_id: { type: string }
+        cycle_s: { type: string }
+    SetupInput:
+      type: object
+      properties:
+        standard_cycle_s: { type: string, nullable: true }
+        active: { type: boolean }
+        colours: { type: array, items: { $ref: "#/components/schemas/SetupColour" } }
+    Mould:
+      type: object
+      properties:
+        id: { type: string }
+        product_id: { type: string }
+        name: { type: string }
+        name_am: { type: string }
+        cavities: { type: integer, nullable: true }
+        active: { type: boolean }
+    MouldInput:
+      type: object
+      properties:
+        product_id: { type: string }
+        name: { type: string }
+        name_am: { type: string }
+        cavities: { type: integer, nullable: true }
+        active: { type: boolean }
+    Shift:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        name_am: { type: string }
+        start_time: { type: string, description: "HH:MM local time" }
+        end_time: { type: string }
+        position: { type: integer }
+        active: { type: boolean }
+        crosses_midnight: { type: boolean, description: Ends the next day; its work belongs to the day it started }
+    ShiftInput:
+      type: object
+      properties:
+        name: { type: string }
+        name_am: { type: string }
+        start_time: { type: string }
+        end_time: { type: string }
+        position: { type: integer }
+        active: { type: boolean }
+        reason: { type: string, description: Required when the times of an existing shift change }
+    Reason:
+      type: object
+      properties:
+        id: { type: string }
+        kind: { type: string, enum: [damage, downtime] }
+        name: { type: string }
+        name_am: { type: string }
+        active: { type: boolean }
+    ReasonInput:
+      type: object
+      properties:
+        kind: { type: string, enum: [damage, downtime] }
+        name: { type: string }
+        name_am: { type: string }
+        active: { type: boolean }
+    Location:
+      type: object
+      properties:
+        key: { type: string, enum: [raw_store, regrind_store, qc_area, staging_area, fg_store] }
+        holds_stock: { type: boolean }
+        name: { type: string }
+        name_am: { type: string }
+    LocationInput:
+      type: object
+      properties:
+        name: { type: string }
+        name_am: { type: string }
+    Profession:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        name_am: { type: string }
+        active: { type: boolean }
+        employees: { type: integer }
+    ProfessionInput:
+      type: object
+      properties:
+        name: { type: string }
+        name_am: { type: string }
+        active: { type: boolean }
+    Employee:
+      type: object
+      properties:
+        id: { type: string }
+        full_name: { type: string }
+        name_am: { type: string, nullable: true }
+        profession_id: { type: string }
+        user_id: { type: string, nullable: true, description: null for people without a sign-in account (operators) }
+        email: { type: string, nullable: true }
+        active: { type: boolean }
+    EmployeeInput:
+      type: object
+      properties:
+        full_name: { type: string }
+        name_am: { type: string, nullable: true }
+        profession_id: { type: string }
+        user_id: { type: string, nullable: true }
+        active: { type: boolean }
+    Settings:
+      type: object
+      properties:
+        display_time_zone: { type: string }
+        login_max_attempts: { type: integer }
+        login_lockout_minutes: { type: integer }
+        rest_rotation_minutes: { type: integer }
+        bom_warn_pct: { type: integer }
+        bom_crit_pct: { type: integer }

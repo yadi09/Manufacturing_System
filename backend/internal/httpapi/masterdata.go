@@ -22,7 +22,7 @@ func writeMasterError(w http.ResponseWriter, err error) {
 	switch e.Code {
 	case masterdata.CodeNotFound, masterdata.CodeNoRecipe:
 		status = http.StatusNotFound
-	case masterdata.CodeDuplicateName, masterdata.CodeUnitLocked, masterdata.CodeVersionConflict:
+	case masterdata.CodeDuplicateName, masterdata.CodeUnitLocked, masterdata.CodeVersionConflict, masterdata.CodeAccountLinked:
 		status = http.StatusConflict
 	}
 	writeError(w, status, e.Code)

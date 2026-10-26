@@ -15,6 +15,7 @@ import (
 	"github.com/yadi09/Manufacturing_System/backend/internal/config"
 	"github.com/yadi09/Manufacturing_System/backend/internal/httpapi"
 	"github.com/yadi09/Manufacturing_System/backend/internal/masterdata"
+	"github.com/yadi09/Manufacturing_System/backend/internal/settings"
 )
 
 func main() {
@@ -38,7 +39,7 @@ func run() error {
 	}
 	defer pool.Close()
 
-	srv := &http.Server{Addr: cfg.Addr, Handler: httpapi.NewRouter(httpapi.Deps{DB: pool, Auth: auth.NewService(pool), Master: masterdata.New(pool), SecureCookie: cfg.SecureCookie}), ReadHeaderTimeout: 5 * time.Second}
+	srv := &http.Server{Addr: cfg.Addr, Handler: httpapi.NewRouter(httpapi.Deps{DB: pool, Auth: auth.NewService(pool), Master: masterdata.New(pool), Settings: settings.New(pool), SecureCookie: cfg.SecureCookie}), ReadHeaderTimeout: 5 * time.Second}
 	go func() {
 		<-ctx.Done()
 		sctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

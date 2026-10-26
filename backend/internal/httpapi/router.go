@@ -11,6 +11,7 @@ import (
 
 	"github.com/yadi09/Manufacturing_System/backend/internal/auth"
 	"github.com/yadi09/Manufacturing_System/backend/internal/masterdata"
+	"github.com/yadi09/Manufacturing_System/backend/internal/settings"
 )
 
 // Pinger is satisfied by *pgxpool.Pool.
@@ -23,6 +24,8 @@ type Deps struct {
 	Auth *auth.Service
 	// Master is the products, materials and recipes service. Optional so older tests can omit it.
 	Master *masterdata.Service
+	// Settings backs the settings screen. Optional like Master.
+	Settings *settings.Store
 	// SecureCookie marks the session cookie HTTPS-only. Turn on in production.
 	SecureCookie bool
 }
@@ -89,6 +92,15 @@ func NewRouter(d Deps) http.Handler {
 					r.Method("GET", "/recipe/versions/{n}", read(mh.getVersion))
 					r.Method("POST", "/recipe/versions", manage(mh.saveRecipe))
 				})
+				mh.setupRoutes(r, read, manage)
+			})
+		}
+		if d.Settings != nil {
+			sh := &settingsHandlers{store: d.Settings}
+			r.Group(func(r chi.Router) {
+				r.Use(RequireAuth(d.Auth))
+				r.Method("GET", "/api/settings", RequirePermission("settings.manage")(http.HandlerFunc(sh.get)))
+				r.Method("PATCH", "/api/settings", RequirePermission("settings.manage")(http.HandlerFunc(sh.update)))
 			})
 		}
 	}
