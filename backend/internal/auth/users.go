@@ -14,27 +14,33 @@ import (
 )
 
 var (
-	ErrUserNotFound  = errors.New("auth: user not found")
-	ErrLastAdmin     = errors.New("auth: at least one active user must keep the users.manage permission")
-	ErrWrongPassword = errors.New("auth: current password is wrong")
-	ErrUnknownRole   = errors.New("auth: unknown role")
+	ErrUserNotFound      = errors.New("auth: user not found")
+	ErrLastAdmin         = errors.New("auth: at least one active user must keep the users.manage permission")
+	ErrWrongPassword     = errors.New("auth: current password is wrong")
+	ErrUnknownRole       = errors.New("auth: unknown role")
+	ErrPasswordUnchanged = errors.New("auth: the new password must be different from the current one")
 )
 
 // lockUserAdmin serializes changes that could remove the last administrator.
 const lockUserAdmin = 4_2_0_1
 
 type UserSummary struct {
-	ID       string   `json:"id"`
-	Email    string   `json:"email"`
-	FullName string   `json:"full_name"`
-	Active   bool     `json:"active"`
-	Roles    []string `json:"roles"`
+	ID                 string   `json:"id"`
+	Email              string   `json:"email"`
+	FullName           string   `json:"full_name"`
+	Active             bool     `json:"active"`
+	MustChangePassword bool     `json:"must_change_password"`
+	Roles              []string `json:"roles"`
 }
 
+// RoleInfo carries names and the one-line description in both languages; they are data, not code.
 type RoleInfo struct {
-	Key         string   `json:"key"`
-	Name        string   `json:"name"`
-	Permissions []string `json:"permissions"`
+	Key           string   `json:"key"`
+	Name          string   `json:"name"`
+	NameAm        string   `json:"name_am"`
+	Description   string   `json:"description"`
+	DescriptionAm string   `json:"description_am"`
+	Permissions   []string `json:"permissions"`
 }
 
 // UserUpdate changes only the fields that are set.
@@ -73,7 +79,7 @@ func (s *Service) ListUsers(ctx context.Context) ([]UserSummary, error) {
 		if r == nil {
 			r = []string{}
 		}
-		out = append(out, UserSummary{ID: id, Email: u.Email, FullName: u.FullName, Active: u.Active, Roles: r})
+		out = append(out, UserSummary{ID: id, Email: u.Email, FullName: u.FullName, Active: u.Active, MustChangePassword: u.MustChangePassword, Roles: r})
 	}
 	return out, nil
 }
@@ -85,14 +91,13 @@ func (s *Service) ListRoles(ctx context.Context) ([]RoleInfo, error) {
 	}
 	out := make([]RoleInfo, 0, len(rows))
 	for _, r := range rows {
-		out = append(out, RoleInfo{Key: r.Key, Name: r.Name, Permissions: r.Permissions})
+		out = append(out, RoleInfo{Key: r.Key, Name: r.Name, NameAm: r.NameAm, Description: r.Description, DescriptionAm: r.DescriptionAm, Permissions: r.Permissions})
 	}
 	return out, nil
 }
 
-func userState(fullName string, active bool, roles []string) []byte {
-	slices.Sort(roles)
-	b, _ := json.Marshal(map[string]any{"full_name": fullName, "active": active, "roles": roles})
+func toJSON(v any) []byte {
+	b, _ := json.Marshal(v)
 	return b
 }
 
@@ -140,8 +145,6 @@ func (s *Service) UpdateUser(ctx context.Context, actor, id string, in UserUpdat
 	for _, r := range curRoles {
 		oldKeys = append(oldKeys, r.Key)
 	}
-	oldState := userState(cur.FullName, cur.Active, slices.Clone(oldKeys))
-
 	name, active, keys := cur.FullName, cur.Active, oldKeys
 	if in.FullName != nil {
 		name = *in.FullName
@@ -175,11 +178,34 @@ func (s *Service) UpdateUser(ctx context.Context, actor, id string, in UserUpdat
 	} else if n == 0 {
 		return ErrLastAdmin
 	}
-	if _, err := q.InsertAudit(ctx, db.InsertAuditParams{
-		Actor: actor, Action: "update", Entity: "users", EntityID: id,
-		OldValue: oldState, NewValue: userState(name, active, keys),
-	}); err != nil {
+	// One audit row per kind of change, each with the old and new value, so the log reads
+	// "deactivated", "roles changed" and so on instead of one blob.
+	audit := func(action string, oldV, newV any) error {
+		_, err := q.InsertAudit(ctx, db.InsertAuditParams{Actor: actor, Action: action, Entity: "users", EntityID: id, OldValue: toJSON(oldV), NewValue: toJSON(newV)})
 		return err
+	}
+	if name != cur.FullName {
+		if err := audit("rename", map[string]any{"full_name": cur.FullName}, map[string]any{"full_name": name}); err != nil {
+			return err
+		}
+	}
+	if active != cur.Active {
+		action := "deactivate"
+		if active {
+			action = "reactivate"
+		}
+		if err := audit(action, map[string]any{"active": cur.Active}, map[string]any{"active": active}); err != nil {
+			return err
+		}
+	}
+	if in.Roles != nil {
+		slices.Sort(oldKeys)
+		slices.Sort(keys)
+		if !slices.Equal(oldKeys, keys) {
+			if err := audit("roles_change", map[string]any{"roles": oldKeys}, map[string]any{"roles": keys}); err != nil {
+				return err
+			}
+		}
 	}
 	return tx.Commit(ctx)
 }
@@ -190,7 +216,7 @@ func (s *Service) ResetPassword(ctx context.Context, actor, id, newPassword stri
 	if err != nil {
 		return err
 	}
-	return s.setPassword(ctx, actor, uid, newPassword, "password_reset", nil)
+	return s.setPassword(ctx, actor, uid, newPassword, "password_reset", nil, true)
 }
 
 // ChangePassword lets a user change their own password. Their other sessions end; the one in use stays.
@@ -206,11 +232,14 @@ func (s *Service) ChangePassword(ctx context.Context, userID, currentToken, curr
 	if !VerifyPassword(current, row.PasswordHash) {
 		return ErrWrongPassword
 	}
+	if VerifyPassword(newPassword, row.PasswordHash) {
+		return ErrPasswordUnchanged
+	}
 	keep := hashToken(currentToken)
-	return s.setPassword(ctx, row.Email, uid, newPassword, "password_change", keep)
+	return s.setPassword(ctx, row.Email, uid, newPassword, "password_change", keep, false)
 }
 
-func (s *Service) setPassword(ctx context.Context, actor string, uid pgtype.UUID, newPassword, action string, keepSession []byte) error {
+func (s *Service) setPassword(ctx context.Context, actor string, uid pgtype.UUID, newPassword, action string, keepSession []byte, mustChange bool) error {
 	if len(newPassword) < MinPasswordLength {
 		return ErrWeakPassword
 	}
@@ -224,12 +253,14 @@ func (s *Service) setPassword(ctx context.Context, actor string, uid pgtype.UUID
 	}
 	defer tx.Rollback(ctx) //nolint:errcheck
 	q := db.New(tx)
-	if _, err := q.GetUserByID(ctx, uid); errors.Is(err, pgx.ErrNoRows) {
+	cur, err := q.GetUserByID(ctx, uid)
+	if errors.Is(err, pgx.ErrNoRows) {
 		return ErrUserNotFound
-	} else if err != nil {
+	}
+	if err != nil {
 		return err
 	}
-	if err := q.UpdatePasswordHash(ctx, db.UpdatePasswordHashParams{ID: uid, PasswordHash: hash}); err != nil {
+	if err := q.UpdatePasswordHash(ctx, db.UpdatePasswordHashParams{ID: uid, PasswordHash: hash, MustChangePassword: mustChange}); err != nil {
 		return err
 	}
 	if keepSession != nil {
@@ -240,8 +271,9 @@ func (s *Service) setPassword(ctx context.Context, actor string, uid pgtype.UUID
 	if err != nil {
 		return err
 	}
-	// The audit row records that it happened, never the password or its hash.
-	if _, err := q.InsertAudit(ctx, db.InsertAuditParams{Actor: actor, Action: action, Entity: "users", EntityID: uuidString(uid)}); err != nil {
+	// The audit row records that it happened and the flag change, never the password or its hash.
+	if _, err := q.InsertAudit(ctx, db.InsertAuditParams{Actor: actor, Action: action, Entity: "users", EntityID: uuidString(uid),
+		OldValue: toJSON(map[string]any{"must_change_password": cur.MustChangePassword}), NewValue: toJSON(map[string]any{"must_change_password": mustChange})}); err != nil {
 		return err
 	}
 	return tx.Commit(ctx)

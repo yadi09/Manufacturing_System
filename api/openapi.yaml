@@ -93,7 +93,7 @@ paths:
         "403":
           description: Current password is wrong (error wrong_password)
         "422":
-          description: New password too short (error weak_password)
+          description: New password too short (weak_password) or the same as the current one (password_unchanged)
   /api/roles:
     get:
       operationId: listRoles
@@ -212,15 +212,17 @@ components:
           type: string
     Role:
       type: object
-      required: [key, name]
+      required: [key, name, name_am]
       properties:
         key:
           type: string
         name:
           type: string
+        name_am:
+          type: string
     User:
       type: object
-      required: [id, email, full_name, roles, permissions]
+      required: [id, email, full_name, must_change_password, roles, permissions]
       properties:
         id:
           type: string
@@ -228,6 +230,9 @@ components:
           type: string
         full_name:
           type: string
+        must_change_password:
+          type: boolean
+          description: When true the API refuses everything except /api/auth/me, /api/auth/password and logout, with 403 password_change_required, until the password is changed
         roles:
           type: array
           items:
@@ -278,7 +283,7 @@ components:
             type: string
     UserSummary:
       type: object
-      required: [id, email, full_name, active, roles]
+      required: [id, email, full_name, active, must_change_password, roles]
       properties:
         id:
           type: string
@@ -288,18 +293,28 @@ components:
           type: string
         active:
           type: boolean
+        must_change_password:
+          type: boolean
         roles:
           type: array
           items:
             type: string
     RoleInfo:
       type: object
-      required: [key, name, permissions]
+      required: [key, name, name_am, description, description_am, permissions]
       properties:
         key:
           type: string
         name:
           type: string
+        name_am:
+          type: string
+        description:
+          type: string
+          description: One line, in English
+        description_am:
+          type: string
+          description: One line, in Amharic (needs native-speaker review)
         permissions:
           type: array
           items:

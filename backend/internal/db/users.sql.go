@@ -58,15 +58,16 @@ func (q *Queries) DeleteUserSessions(ctx context.Context, userID pgtype.UUID) er
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, email, full_name, password_hash, active FROM users WHERE id = $1
+SELECT id, email, full_name, password_hash, active, must_change_password FROM users WHERE id = $1
 `
 
 type GetUserByIDRow struct {
-	ID           pgtype.UUID `json:"id"`
-	Email        string      `json:"email"`
-	FullName     string      `json:"full_name"`
-	PasswordHash string      `json:"password_hash"`
-	Active       bool        `json:"active"`
+	ID                 pgtype.UUID `json:"id"`
+	Email              string      `json:"email"`
+	FullName           string      `json:"full_name"`
+	PasswordHash       string      `json:"password_hash"`
+	Active             bool        `json:"active"`
+	MustChangePassword bool        `json:"must_change_password"`
 }
 
 func (q *Queries) GetUserByID(ctx context.Context, id pgtype.UUID) (GetUserByIDRow, error) {
@@ -78,6 +79,7 @@ func (q *Queries) GetUserByID(ctx context.Context, id pgtype.UUID) (GetUserByIDR
 		&i.FullName,
 		&i.PasswordHash,
 		&i.Active,
+		&i.MustChangePassword,
 	)
 	return i, err
 }
@@ -107,15 +109,18 @@ func (q *Queries) ListAllUserRoles(ctx context.Context) ([]UserRole, error) {
 }
 
 const listRolesWithPermissions = `-- name: ListRolesWithPermissions :many
-SELECT r.key, r.name, COALESCE(array_agg(rp.permission ORDER BY rp.permission) FILTER (WHERE rp.permission IS NOT NULL), '{}')::text[] AS permissions
+SELECT r.key, r.name, r.name_am, r.description, r.description_am, COALESCE(array_agg(rp.permission ORDER BY rp.permission) FILTER (WHERE rp.permission IS NOT NULL), '{}')::text[] AS permissions
 FROM roles r LEFT JOIN role_permissions rp ON rp.role_key = r.key
-GROUP BY r.key, r.name ORDER BY r.key
+GROUP BY r.key ORDER BY r.key
 `
 
 type ListRolesWithPermissionsRow struct {
-	Key         string   `json:"key"`
-	Name        string   `json:"name"`
-	Permissions []string `json:"permissions"`
+	Key           string   `json:"key"`
+	Name          string   `json:"name"`
+	NameAm        string   `json:"name_am"`
+	Description   string   `json:"description"`
+	DescriptionAm string   `json:"description_am"`
+	Permissions   []string `json:"permissions"`
 }
 
 func (q *Queries) ListRolesWithPermissions(ctx context.Context) ([]ListRolesWithPermissionsRow, error) {
@@ -127,7 +132,14 @@ func (q *Queries) ListRolesWithPermissions(ctx context.Context) ([]ListRolesWith
 	var items []ListRolesWithPermissionsRow
 	for rows.Next() {
 		var i ListRolesWithPermissionsRow
-		if err := rows.Scan(&i.Key, &i.Name, &i.Permissions); err != nil {
+		if err := rows.Scan(
+			&i.Key,
+			&i.Name,
+			&i.NameAm,
+			&i.Description,
+			&i.DescriptionAm,
+			&i.Permissions,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -139,15 +151,16 @@ func (q *Queries) ListRolesWithPermissions(ctx context.Context) ([]ListRolesWith
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, email, full_name, active, created_at FROM users ORDER BY email
+SELECT id, email, full_name, active, must_change_password, created_at FROM users ORDER BY email
 `
 
 type ListUsersRow struct {
-	ID        pgtype.UUID        `json:"id"`
-	Email     string             `json:"email"`
-	FullName  string             `json:"full_name"`
-	Active    bool               `json:"active"`
-	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	ID                 pgtype.UUID        `json:"id"`
+	Email              string             `json:"email"`
+	FullName           string             `json:"full_name"`
+	Active             bool               `json:"active"`
+	MustChangePassword bool               `json:"must_change_password"`
+	CreatedAt          pgtype.Timestamptz `json:"created_at"`
 }
 
 func (q *Queries) ListUsers(ctx context.Context) ([]ListUsersRow, error) {
@@ -164,6 +177,7 @@ func (q *Queries) ListUsers(ctx context.Context) ([]ListUsersRow, error) {
 			&i.Email,
 			&i.FullName,
 			&i.Active,
+			&i.MustChangePassword,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -177,16 +191,17 @@ func (q *Queries) ListUsers(ctx context.Context) ([]ListUsersRow, error) {
 }
 
 const updatePasswordHash = `-- name: UpdatePasswordHash :exec
-UPDATE users SET password_hash = $2 WHERE id = $1
+UPDATE users SET password_hash = $2, must_change_password = $3 WHERE id = $1
 `
 
 type UpdatePasswordHashParams struct {
-	ID           pgtype.UUID `json:"id"`
-	PasswordHash string      `json:"password_hash"`
+	ID                 pgtype.UUID `json:"id"`
+	PasswordHash       string      `json:"password_hash"`
+	MustChangePassword bool        `json:"must_change_password"`
 }
 
 func (q *Queries) UpdatePasswordHash(ctx context.Context, arg UpdatePasswordHashParams) error {
-	_, err := q.db.Exec(ctx, updatePasswordHash, arg.ID, arg.PasswordHash)
+	_, err := q.db.Exec(ctx, updatePasswordHash, arg.ID, arg.PasswordHash, arg.MustChangePassword)
 	return err
 }
 

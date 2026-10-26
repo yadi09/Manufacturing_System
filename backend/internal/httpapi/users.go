@@ -43,6 +43,8 @@ func writeAuthError(w http.ResponseWriter, err error) {
 		writeError(w, http.StatusUnprocessableEntity, "unknown_role")
 	case errors.Is(err, auth.ErrLastAdmin):
 		writeError(w, http.StatusConflict, "last_admin")
+	case errors.Is(err, auth.ErrPasswordUnchanged):
+		writeError(w, http.StatusUnprocessableEntity, "password_unchanged")
 	case errors.Is(err, auth.ErrWrongPassword):
 		writeError(w, http.StatusForbidden, "wrong_password")
 	default:
@@ -81,7 +83,7 @@ func (h *userHandlers) create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	actor, _ := CurrentUser(r.Context())
-	u, err := h.auth.CreateUser(r.Context(), actor.Email, req.Email, req.FullName, req.Password, req.Roles)
+	u, err := h.auth.CreateUser(r.Context(), actor.Email, req.Email, req.FullName, req.Password, req.Roles, true)
 	if err != nil {
 		writeAuthError(w, err)
 		return

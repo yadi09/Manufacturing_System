@@ -34,6 +34,6 @@ migrate:
 sqlc:
 	cd backend && sqlc generate
 
-# make create-user EMAIL=admin@crown.example NAME="Admin" ROLES=admin   (asks for the password)
+# make create-user EMAIL=admin@crown.example NAME="Admin" ROLES=admin   (asks for the password; add CREATE_USER_FLAGS=-must-change if someone else will be told it)
 create-user:
-	cd backend && go run ./cmd/createuser -email "$(EMAIL)" -name "$(NAME)" -roles "$(ROLES)"
+	cd backend && go run ./cmd/createuser -email "$(EMAIL)" -name "$(NAME)" -roles "$(ROLES)" $(CREATE_USER_FLAGS)

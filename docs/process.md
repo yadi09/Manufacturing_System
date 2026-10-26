@@ -65,10 +65,19 @@ Each person has one or more roles; roles control what they can see and approve. 
 | Purchaser | Edits and approves purchase orders; records receiving |
 | Finance (report user) | Reads daily, weekly and monthly production and reconciliation reports |
 | Owner / GM | Reads the live board, dashboards and all reports |
+| Administrator | Creates and manages user accounts and roles; later also settings, products, BOMs, shifts and damage reasons |
 
 **Sample approval** is a separate permission. The cashier creates sample requests and the store manager approves them as delivered when releasing the sample. Both are configurable.
 
 One person can hold several roles (an operator who rotates to QC), and every action is stored with the user, the time and the shift.
+
+**User accounts**
+- Only an administrator creates accounts. People sign in with email and password; there is no self sign-up.
+- Role names, their one-line descriptions and their permissions are data in the database (English and Amharic), not fixed in code. Roles for features that do not exist yet carry no permissions until their milestone adds them.
+- The administrator sets a temporary password (typed or generated) and tells the person privately. The system shows a generated password once, right after it is set. A new account, and any password reset by an administrator, **must be changed at the person's first sign-in**; until then the API allows only changing the password.
+- Deactivating a person (a separate button with a confirmation) stops them signing in and ends their open sessions at once; their records stay. Reactivating is a plain button. Email addresses cannot be changed after creation for now.
+- The last active administrator cannot be deactivated or lose the administrator role; the API refuses, whatever the screen shows.
+- Every role change, deactivation, reactivation, rename and password reset or change is written to the audit log with who did it, when, and the old and new value (never a password or hash). Sign-in successes and failures are logged too, and five failed attempts for an email pause sign-in for 15 minutes (a setting).
 
 ## Order-to-production chain
 

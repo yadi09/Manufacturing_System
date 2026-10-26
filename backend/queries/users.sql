@@ -1,8 +1,8 @@
 -- name: GetUserByID :one
-SELECT id, email, full_name, password_hash, active FROM users WHERE id = $1;
+SELECT id, email, full_name, password_hash, active, must_change_password FROM users WHERE id = $1;
 
 -- name: ListUsers :many
-SELECT id, email, full_name, active, created_at FROM users ORDER BY email;
+SELECT id, email, full_name, active, must_change_password, created_at FROM users ORDER BY email;
 
 -- name: ListAllUserRoles :many
 SELECT user_id, role_key FROM user_roles ORDER BY role_key;
@@ -14,7 +14,7 @@ UPDATE users SET full_name = $2, active = $3 WHERE id = $1;
 DELETE FROM user_roles WHERE user_id = $1;
 
 -- name: UpdatePasswordHash :exec
-UPDATE users SET password_hash = $2 WHERE id = $1;
+UPDATE users SET password_hash = $2, must_change_password = $3 WHERE id = $1;
 
 -- name: DeleteUserSessions :exec
 DELETE FROM sessions WHERE user_id = $1;
@@ -29,6 +29,6 @@ JOIN role_permissions rp ON rp.role_key = ur.role_key
 WHERE u.active AND rp.permission = 'users.manage';
 
 -- name: ListRolesWithPermissions :many
-SELECT r.key, r.name, COALESCE(array_agg(rp.permission ORDER BY rp.permission) FILTER (WHERE rp.permission IS NOT NULL), '{}')::text[] AS permissions
+SELECT r.key, r.name, r.name_am, r.description, r.description_am, COALESCE(array_agg(rp.permission ORDER BY rp.permission) FILTER (WHERE rp.permission IS NOT NULL), '{}')::text[] AS permissions
 FROM roles r LEFT JOIN role_permissions rp ON rp.role_key = r.key
-GROUP BY r.key, r.name ORDER BY r.key;
+GROUP BY r.key ORDER BY r.key;

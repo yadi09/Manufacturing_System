@@ -22,8 +22,18 @@ func CurrentUser(ctx context.Context) (auth.User, bool) {
 	return u, ok
 }
 
-// RequireAuth rejects requests without a valid session.
-func RequireAuth(svc *auth.Service) func(http.Handler) http.Handler {
+// RequireAuth rejects requests without a valid session, and also rejects users who must
+// change their password first (403 password_change_required). It is the safe default for
+// every route; only the few routes a user needs to change the password use
+// RequireAuthEvenIfPasswordMustChange.
+func RequireAuth(svc *auth.Service) func(http.Handler) http.Handler { return requireAuth(svc, false) }
+
+// RequireAuthEvenIfPasswordMustChange is for reading /me and changing the password only.
+func RequireAuthEvenIfPasswordMustChange(svc *auth.Service) func(http.Handler) http.Handler {
+	return requireAuth(svc, true)
+}
+
+func requireAuth(svc *auth.Service, allowMustChange bool) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			c, err := r.Cookie(sessionCookie)
@@ -38,6 +48,10 @@ func RequireAuth(svc *auth.Service) func(http.Handler) http.Handler {
 			}
 			if err != nil {
 				writeError(w, http.StatusInternalServerError, "internal")
+				return
+			}
+			if u.MustChangePassword && !allowMustChange {
+				writeError(w, http.StatusForbidden, "password_change_required")
 				return
 			}
 			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ctxKey{}, u)))

@@ -21,8 +21,11 @@ type AuditLog struct {
 }
 
 type Role struct {
-	Key  string `json:"key"`
-	Name string `json:"name"`
+	Key           string `json:"key"`
+	Name          string `json:"name"`
+	NameAm        string `json:"name_am"`
+	Description   string `json:"description"`
+	DescriptionAm string `json:"description_am"`
 }
 
 type RolePermission struct {
@@ -44,12 +47,13 @@ type Setting struct {
 }
 
 type User struct {
-	ID           pgtype.UUID        `json:"id"`
-	Email        string             `json:"email"`
-	FullName     string             `json:"full_name"`
-	PasswordHash string             `json:"password_hash"`
-	Active       bool               `json:"active"`
-	CreatedAt    pgtype.Timestamptz `json:"created_at"`
+	ID                 pgtype.UUID        `json:"id"`
+	Email              string             `json:"email"`
+	FullName           string             `json:"full_name"`
+	PasswordHash       string             `json:"password_hash"`
+	Active             bool               `json:"active"`
+	CreatedAt          pgtype.Timestamptz `json:"created_at"`
+	MustChangePassword bool               `json:"must_change_password"`
 }
 
 type UserRole struct {

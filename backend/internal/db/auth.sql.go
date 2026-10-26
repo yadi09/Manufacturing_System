@@ -41,32 +41,40 @@ func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) er
 }
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (email, full_name, password_hash) VALUES ($1, $2, $3)
-RETURNING id, email, full_name, active, created_at
+INSERT INTO users (email, full_name, password_hash, must_change_password) VALUES ($1, $2, $3, $4)
+RETURNING id, email, full_name, active, must_change_password, created_at
 `
 
 type CreateUserParams struct {
-	Email        string `json:"email"`
-	FullName     string `json:"full_name"`
-	PasswordHash string `json:"password_hash"`
+	Email              string `json:"email"`
+	FullName           string `json:"full_name"`
+	PasswordHash       string `json:"password_hash"`
+	MustChangePassword bool   `json:"must_change_password"`
 }
 
 type CreateUserRow struct {
-	ID        pgtype.UUID        `json:"id"`
-	Email     string             `json:"email"`
-	FullName  string             `json:"full_name"`
-	Active    bool               `json:"active"`
-	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	ID                 pgtype.UUID        `json:"id"`
+	Email              string             `json:"email"`
+	FullName           string             `json:"full_name"`
+	Active             bool               `json:"active"`
+	MustChangePassword bool               `json:"must_change_password"`
+	CreatedAt          pgtype.Timestamptz `json:"created_at"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error) {
-	row := q.db.QueryRow(ctx, createUser, arg.Email, arg.FullName, arg.PasswordHash)
+	row := q.db.QueryRow(ctx, createUser,
+		arg.Email,
+		arg.FullName,
+		arg.PasswordHash,
+		arg.MustChangePassword,
+	)
 	var i CreateUserRow
 	err := row.Scan(
 		&i.ID,
 		&i.Email,
 		&i.FullName,
 		&i.Active,
+		&i.MustChangePassword,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -82,16 +90,17 @@ func (q *Queries) DeleteSession(ctx context.Context, tokenHash []byte) error {
 }
 
 const getSessionUser = `-- name: GetSessionUser :one
-SELECT u.id, u.email, u.full_name, u.active
+SELECT u.id, u.email, u.full_name, u.active, u.must_change_password
 FROM sessions s JOIN users u ON u.id = s.user_id
 WHERE s.token_hash = $1 AND s.expires_at > now()
 `
 
 type GetSessionUserRow struct {
-	ID       pgtype.UUID `json:"id"`
-	Email    string      `json:"email"`
-	FullName string      `json:"full_name"`
-	Active   bool        `json:"active"`
+	ID                 pgtype.UUID `json:"id"`
+	Email              string      `json:"email"`
+	FullName           string      `json:"full_name"`
+	Active             bool        `json:"active"`
+	MustChangePassword bool        `json:"must_change_password"`
 }
 
 func (q *Queries) GetSessionUser(ctx context.Context, tokenHash []byte) (GetSessionUserRow, error) {
@@ -102,20 +111,22 @@ func (q *Queries) GetSessionUser(ctx context.Context, tokenHash []byte) (GetSess
 		&i.Email,
 		&i.FullName,
 		&i.Active,
+		&i.MustChangePassword,
 	)
 	return i, err
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, full_name, password_hash, active FROM users WHERE email = $1
+SELECT id, email, full_name, password_hash, active, must_change_password FROM users WHERE email = $1
 `
 
 type GetUserByEmailRow struct {
-	ID           pgtype.UUID `json:"id"`
-	Email        string      `json:"email"`
-	FullName     string      `json:"full_name"`
-	PasswordHash string      `json:"password_hash"`
-	Active       bool        `json:"active"`
+	ID                 pgtype.UUID `json:"id"`
+	Email              string      `json:"email"`
+	FullName           string      `json:"full_name"`
+	PasswordHash       string      `json:"password_hash"`
+	Active             bool        `json:"active"`
+	MustChangePassword bool        `json:"must_change_password"`
 }
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEmailRow, error) {
@@ -127,6 +138,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEm
 		&i.FullName,
 		&i.PasswordHash,
 		&i.Active,
+		&i.MustChangePassword,
 	)
 	return i, err
 }
@@ -158,20 +170,26 @@ func (q *Queries) ListUserPermissions(ctx context.Context, userID pgtype.UUID) (
 }
 
 const listUserRoles = `-- name: ListUserRoles :many
-SELECT r.key, r.name FROM user_roles ur JOIN roles r ON r.key = ur.role_key
+SELECT r.key, r.name, r.name_am FROM user_roles ur JOIN roles r ON r.key = ur.role_key
 WHERE ur.user_id = $1 ORDER BY r.key
 `
 
-func (q *Queries) ListUserRoles(ctx context.Context, userID pgtype.UUID) ([]Role, error) {
+type ListUserRolesRow struct {
+	Key    string `json:"key"`
+	Name   string `json:"name"`
+	NameAm string `json:"name_am"`
+}
+
+func (q *Queries) ListUserRoles(ctx context.Context, userID pgtype.UUID) ([]ListUserRolesRow, error) {
 	rows, err := q.db.Query(ctx, listUserRoles, userID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Role
+	var items []ListUserRolesRow
 	for rows.Next() {
-		var i Role
-		if err := rows.Scan(&i.Key, &i.Name); err != nil {
+		var i ListUserRolesRow
+		if err := rows.Scan(&i.Key, &i.Name, &i.NameAm); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

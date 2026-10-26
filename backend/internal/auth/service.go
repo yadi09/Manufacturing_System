@@ -33,17 +33,21 @@ var (
 )
 
 type Role struct {
-	Key  string `json:"key"`
-	Name string `json:"name"`
+	Key    string `json:"key"`
+	Name   string `json:"name"`
+	NameAm string `json:"name_am"`
 }
 
 // User is the signed-in person with their roles and the permissions those roles grant.
 type User struct {
-	ID          string   `json:"id"`
-	Email       string   `json:"email"`
-	FullName    string   `json:"full_name"`
-	Roles       []Role   `json:"roles"`
-	Permissions []string `json:"permissions"`
+	ID       string `json:"id"`
+	Email    string `json:"email"`
+	FullName string `json:"full_name"`
+	// MustChangePassword is true after a new user or a reset: the API allows only changing the
+	// password (and reading /me, signing out) until it is done.
+	MustChangePassword bool     `json:"must_change_password"`
+	Roles              []Role   `json:"roles"`
+	Permissions        []string `json:"permissions"`
 }
 
 func (u User) Can(permission string) bool {
@@ -93,7 +97,9 @@ func uuidString(u pgtype.UUID) string {
 }
 
 // CreateUser adds an active user with the given role keys and audits it.
-func (s *Service) CreateUser(ctx context.Context, actor, email, fullName, password string, roleKeys []string) (User, error) {
+// CreateUser adds an active user. mustChange makes them choose a new password at first sign-in;
+// use true whenever someone other than the user chose the password.
+func (s *Service) CreateUser(ctx context.Context, actor, email, fullName, password string, roleKeys []string, mustChange bool) (User, error) {
 	email, err := normalizeEmail(email)
 	if err != nil {
 		return User{}, err
@@ -112,7 +118,7 @@ func (s *Service) CreateUser(ctx context.Context, actor, email, fullName, passwo
 	defer tx.Rollback(ctx) //nolint:errcheck
 	q := db.New(tx)
 
-	row, err := q.CreateUser(ctx, db.CreateUserParams{Email: email, FullName: fullName, PasswordHash: hash})
+	row, err := q.CreateUser(ctx, db.CreateUserParams{Email: email, FullName: fullName, PasswordHash: hash, MustChangePassword: mustChange})
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
@@ -129,7 +135,7 @@ func (s *Service) CreateUser(ctx context.Context, actor, email, fullName, passwo
 			return User{}, fmt.Errorf("assign role %q: %w", key, err)
 		}
 	}
-	newVal := fmt.Sprintf(`{"email":%q,"roles":%q}`, email, strings.Join(roleKeys, ","))
+	newVal := fmt.Sprintf(`{"email":%q,"roles":%q,"must_change_password":%t}`, email, strings.Join(roleKeys, ","), mustChange)
 	if _, err := q.InsertAudit(ctx, db.InsertAuditParams{
 		Actor: actor, Action: "create", Entity: "users", EntityID: uuidString(row.ID), NewValue: []byte(newVal),
 	}); err != nil {
@@ -138,10 +144,10 @@ func (s *Service) CreateUser(ctx context.Context, actor, email, fullName, passwo
 	if err := tx.Commit(ctx); err != nil {
 		return User{}, err
 	}
-	return s.loadUser(ctx, db.New(s.pool), row.ID, email, fullName)
+	return s.loadUser(ctx, db.New(s.pool), row.ID, email, fullName, mustChange)
 }
 
-func (s *Service) loadUser(ctx context.Context, q *db.Queries, id pgtype.UUID, email, fullName string) (User, error) {
+func (s *Service) loadUser(ctx context.Context, q *db.Queries, id pgtype.UUID, email, fullName string, mustChange bool) (User, error) {
 	roles, err := q.ListUserRoles(ctx, id)
 	if err != nil {
 		return User{}, err
@@ -150,12 +156,12 @@ func (s *Service) loadUser(ctx context.Context, q *db.Queries, id pgtype.UUID, e
 	if err != nil {
 		return User{}, err
 	}
-	u := User{ID: uuidString(id), Email: email, FullName: fullName, Roles: []Role{}, Permissions: perms}
+	u := User{ID: uuidString(id), Email: email, FullName: fullName, MustChangePassword: mustChange, Roles: []Role{}, Permissions: perms}
 	if u.Permissions == nil {
 		u.Permissions = []string{}
 	}
 	for _, r := range roles {
-		u.Roles = append(u.Roles, Role{Key: r.Key, Name: r.Name})
+		u.Roles = append(u.Roles, Role{Key: r.Key, Name: r.Name, NameAm: r.NameAm})
 	}
 	return u, nil
 }
@@ -193,7 +199,7 @@ func (s *Service) Login(ctx context.Context, email, password string) (token stri
 		return "", User{}, err
 	}
 	s.audit(ctx, q, email, "login", uuidString(row.ID))
-	user, err = s.loadUser(ctx, q, row.ID, row.Email, row.FullName)
+	user, err = s.loadUser(ctx, q, row.ID, row.Email, row.FullName, row.MustChangePassword)
 	return token, user, err
 }
 
@@ -214,7 +220,7 @@ func (s *Service) Authenticate(ctx context.Context, token string) (User, error) 
 	if err != nil {
 		return User{}, err
 	}
-	return s.loadUser(ctx, q, row.ID, row.Email, row.FullName)
+	return s.loadUser(ctx, q, row.ID, row.Email, row.FullName, row.MustChangePassword)
 }
 
 // Logout ends the session. Unknown tokens are ignored.

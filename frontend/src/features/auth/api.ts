@@ -3,12 +3,15 @@ import { ApiError, request } from "../../api/client";
 export interface Role {
   key: string;
   name: string;
+  name_am: string;
 }
 
 export interface User {
   id: string;
   email: string;
   full_name: string;
+  /** True after a new user or a reset: the API allows only changing the password until it is done. */
+  must_change_password: boolean;
   roles: Role[];
   permissions: string[];
 }
